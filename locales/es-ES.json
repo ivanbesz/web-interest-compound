@@ -1,0 +1,99 @@
+{
+  "_meta": "Created on 2026-01-02 by Ivan Bes",
+  "app": {
+    "title": "Calculadora de interés compuesto",
+    "label": "Finanzas",
+    "heading": "Calculadora de interés compuesto",
+    "subheading": "Proyecta el crecimiento de tu inversión con aportes periódicos, capitalización configurable y una visualización clara."
+  },
+  "actions": {
+    "primaryCta": "Comenzar cálculo",
+    "secondaryCta": "Ver proyección",
+    "calculate": "Calcular",
+    "reset": "Restablecer"
+  },
+  "highlights": {
+    "nextStep": "Siguiente paso",
+    "title": "Define tu meta y horizonte",
+    "copy": "Ajusta aportaciones y tasa para ver cómo cambia el resultado final.",
+    "estimate": "Balance proyectado",
+    "term": "Horizonte"
+  },
+  "common": {
+    "year": "año",
+    "years": "años",
+    "yearLabel": "Año",
+    "monthLabel": "Mes",
+    "periodLabel": "Periodo"
+  },
+  "ads": {
+    "label": "Publicidad",
+    "aria": "Publicidad recomendada"
+  },
+  "form": {
+    "label": "Configuración",
+    "title": "Parámetros del cálculo",
+    "copy": "Ajusta capital inicial, aportaciones y tasa de interés. El cálculo usa capitalización compuesta y muestra contribuciones totales, intereses y balance final.",
+    "hint": "Las aportaciones empiezan a devengar interés desde el siguiente período de capitalización.",
+    "initial": "Capital inicial",
+    "contribution": "Aporte mensual",
+    "rate": "Tasa de interés anual (%)",
+    "years": "Horizonte (años)",
+    "frequency": "Frecuencia de capitalización",
+    "start": "Mes de inicio",
+    "frequencies": {
+      "yearly": "Anualmente",
+      "semiannually": "Semestralmente",
+      "quarterly": "Trimestral",
+      "monthly": "Mensualmente",
+      "weekly": "Semanalmente",
+      "daily": "Diariamente"
+    }
+  },
+  "placeholders": {
+    "initial": "Introduce tu capital inicial",
+    "contribution": "Introduce el aporte mensual",
+    "rate": "Ej. 6.5",
+    "years": "Ej. 15"
+  },
+  "summary": {
+    "label": "Resultados",
+    "title": "Tu proyección",
+    "balance": "Balance final",
+    "contributions": "Aportes",
+    "interest": "Intereses"
+  },
+  "chart": {
+    "label": "Evolución",
+    "title": "Balance y aportes",
+    "aria": "Gráfico de proyección",
+    "series": {
+      "balance": "Balance",
+      "contributions": "Aportes"
+    }
+  },
+  "table": {
+    "label": "Detalle",
+    "title": "Resumen por periodo",
+    "period": "Periodo",
+    "year": "Año",
+    "balance": "Balance",
+    "contributions": "Aportes acumulados",
+    "interest": "Interés acumulado"
+  },
+  "seo": {
+    "title": "Calculadora de interés compuesto | Ahorro e inversión",
+    "description": "Calculadora de interés compuesto con aportes periódicos, capitalización configurable, gráficos y resumen anual detallado.",
+    "keywords": "interés compuesto, calculadora, finanzas personales, ahorro, inversión, aportaciones periódicas"
+  },
+  "footer": {
+    "label": "Nota",
+    "disclaimer": "Esta herramienta es solo informativa y no sustituye asesoramiento financiero. Ajusta tasas y aportaciones para aproximarlas a tu realidad.",
+    "meta": "Hecho para visualizar tu crecimiento."
+  },
+  "errors": {
+    "initial": "La inversión inicial es obligatoria y no puede ser negativa.",
+    "years": "La cantidad de tiempo en años es obligatoria y debe ser mayor que cero.",
+    "rate": "La tasa de interés estimada es obligatoria y debe ser mayor que cero."
+  }
+}

@@ -1,0 +1,260 @@
+<!-- Created on 2026-01-02 by Ivan Bes -->
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Compound interest calculator</title>
+    <meta name="description" data-i18n="seo.description" data-i18n-attr="content" content="Compound interest calculator with periodic contributions, charts, and annual breakdown." />
+    <meta name="keywords" data-i18n="seo.keywords" data-i18n-attr="content" content="compound interest, calculator, finance, savings, investing" />
+    <meta name="robots" content="index,follow" />
+    <meta name="theme-color" content="#0c1021" />
+    <link rel="canonical" href="https://blwond.github.io/web-interest-compound/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" data-i18n="seo.title" data-i18n-attr="content" content="Compound interest calculator" />
+    <meta property="og:description" data-i18n="seo.description" data-i18n-attr="content" content="Compound interest calculator with periodic contributions, charts, and annual breakdown." />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="twitter:card" content="summary_large_image" />
+    <script id="structuredData" type="application/ld+json"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script
+      src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"
+      integrity="sha256-TvSIkAn3Zbs6k8ZZrVSu2Ce279b9Ec/WWEDuJeayQMk="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXX"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div id="app" v-cloak class="page">
+      <header class="hero">
+        <div class="hero__text">
+          <p class="eyebrow">{{ t('app.label') }}</p>
+          <h1>{{ t('app.heading') }}</h1>
+          <p class="lede">
+            {{ t('app.subheading') }}
+          </p>
+          <div class="hero__cta">
+            <button type="button" class="btn primary" @click="scrollTo('calculator')">
+              {{ t('actions.primaryCta') }}
+            </button>
+            <button type="button" class="btn ghost" @click="scrollTo('insights')">
+              {{ t('actions.secondaryCta') }}
+            </button>
+          </div>
+        </div>
+        <div class="hero__card glass">
+          <div class="hero__preview">
+            <p class="mini-label">{{ t('highlights.nextStep') }}</p>
+            <h3>{{ t('highlights.title') }}</h3>
+            <p class="mini-lede">{{ t('highlights.copy') }}</p>
+            <div class="preview__stats">
+              <div>
+                <p class="mini-label">{{ t('highlights.estimate') }}</p>
+                <p class="metric">{{ formatCurrency(results.finalBalance) }}</p>
+              </div>
+              <div>
+                <p class="mini-label">{{ t('highlights.term') }}</p>
+                <p class="metric">{{ formatTerm(form.years) }}</p>
+              </div>
+            </div>
+            <div class="preview__pulse" aria-hidden="true"></div>
+          </div>
+        </div>
+      </header>
+
+      <section class="ad-banner" :aria-label="t('ads.aria') || 'Publicidad'">
+        <div class="ad-banner__content">
+          <p class="mini-label">{{ t('ads.label') }}</p>
+          <ins
+            class="adsbygoogle"
+            style="display: block"
+            data-ad-format="auto"
+            data-full-width-responsive="true"
+            data-ad-client="ca-pub-XXXXXXXXXXXXXXX"
+            data-ad-slot="0000000000"
+          ></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </div>
+      </section>
+
+      <main class="layout">
+        <section class="panel" id="calculator">
+          <div class="panel__header">
+            <div>
+              <p class="mini-label">{{ t('form.label') }}</p>
+              <h2>{{ t('form.title') }}</h2>
+              <p class="mini-lede">
+                {{ t('form.copy') }}
+              </p>
+              <p class="mini-lede note">
+                {{ t('form.hint') }}
+              </p>
+            </div>
+          </div>
+          <div class="panel__body">
+            <div class="inputs-grid">
+              <label class="input">
+                <span>{{ t('form.initial') }} <span class="required">*</span></span>
+                <input
+                  type="number"
+                  inputmode="decimal"
+                  min="0"
+                  v-model.number="form.initial"
+                  :placeholder="t('placeholders.initial')"
+                  :aria-label="t('form.initial')"
+                  required
+                />
+              </label>
+              <label class="input">
+                <span>{{ t('form.contribution') }}</span>
+                <input
+                  type="number"
+                  inputmode="decimal"
+                  min="0"
+                  v-model.number="form.contribution"
+                  :placeholder="t('placeholders.contribution')"
+                  :aria-label="t('form.contribution')"
+                />
+              </label>
+              <label class="input">
+                <span>{{ t('form.rate') }} <span class="required">*</span></span>
+                <input
+                  type="number"
+                  inputmode="decimal"
+                  step="0.01"
+                  min="0"
+                  v-model.number="form.rate"
+                  :placeholder="t('placeholders.rate')"
+                  :aria-label="t('form.rate')"
+                  required
+                />
+              </label>
+              <label class="input">
+                <span>{{ t('form.years') }} <span class="required">*</span></span>
+                <input
+                  type="number"
+                  inputmode="numeric"
+                  min="1"
+                  v-model.number="form.years"
+                  :placeholder="t('placeholders.years')"
+                  :aria-label="t('form.years')"
+                  required
+                />
+              </label>
+              <label class="input">
+                <span>{{ t('form.frequency') }}</span>
+                <select v-model.number="form.frequency" :aria-label="t('form.frequency')">
+                  <option value="1">{{ t('form.frequencies.yearly') }}</option>
+                  <option value="2">{{ t('form.frequencies.semiannually') }}</option>
+                  <option value="4">{{ t('form.frequencies.quarterly') }}</option>
+                  <option value="12">{{ t('form.frequencies.monthly') }}</option>
+                  <option value="52">{{ t('form.frequencies.weekly') }}</option>
+                  <option value="365">{{ t('form.frequencies.daily') }}</option>
+                </select>
+              </label>
+              <label class="input">
+                <span>{{ t('form.start') }}</span>
+                <input type="month" v-model="form.startMonth" :aria-label="t('form.start')" />
+              </label>
+            </div>
+            <div class="actions">
+              <button class="btn primary" type="button" @click="handleCalculate">
+                {{ t('actions.calculate') }}
+              </button>
+              <button class="btn ghost" type="button" @click="resetForm">
+                {{ t('actions.reset') }}
+              </button>
+            </div>
+            <div class="errors" v-if="errors.length">
+              <p class="error-text" v-for="err in errors" :key="err">{{ err }}</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="grid" id="insights">
+          <article class="card summary">
+            <div class="card__header">
+              <p class="mini-label">{{ t('summary.label') }}</p>
+              <h3>{{ t('summary.title') }}</h3>
+            </div>
+            <div class="summary__stats">
+              <div class="stat">
+                <p class="mini-label">{{ t('summary.balance') }}</p>
+                <p class="stat__value">{{ formatCurrency(results.finalBalance) }}</p>
+              </div>
+              <div class="stat">
+                <p class="mini-label">{{ t('summary.contributions') }}</p>
+                <p class="stat__value">{{ formatCurrency(results.totalContributions) }}</p>
+              </div>
+              <div class="stat">
+                <p class="mini-label">{{ t('summary.interest') }}</p>
+                <p class="stat__value">{{ formatCurrency(results.totalInterest) }}</p>
+              </div>
+            </div>
+          </article>
+
+          <article class="card chart-card">
+            <div class="card__header">
+              <p class="mini-label">{{ t('chart.label') }}</p>
+              <h3>{{ t('chart.title') }}</h3>
+            </div>
+            <canvas ref="chartEl" :aria-label="t('chart.aria')" role="img"></canvas>
+          </article>
+
+          <article class="card table-card">
+            <div class="card__header">
+              <p class="mini-label">{{ t('table.label') }}</p>
+              <h3>{{ t('table.title') }}</h3>
+            </div>
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>{{ t('table.period') }}</th>
+                    <th>{{ t('table.balance') }}</th>
+                    <th>{{ t('table.contributions') }}</th>
+                    <th>{{ t('table.interest') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="row in tableRows" :key="row.label">
+                    <td>{{ row.label }}</td>
+                    <td>{{ formatCurrency(row.balance) }}</td>
+                    <td>{{ formatCurrency(row.contributions) }}</td>
+                    <td>{{ formatCurrency(row.interest) }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <div>
+          <p class="mini-label">{{ t('footer.label') }}</p>
+          <p class="mini-lede">
+            {{ t('footer.disclaimer') }}
+          </p>
+        </div>
+        <div class="footer__meta">
+          <p class="mini-lede">{{ t('footer.meta') }}</p>
+        </div>
+      </footer>
+    </div>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

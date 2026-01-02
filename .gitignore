@@ -1,0 +1,7 @@
+# Created on 2026-01-02 by Ivan Bes
+node_modules
+.DS_Store
+dist
+build
+.env
+*.log
