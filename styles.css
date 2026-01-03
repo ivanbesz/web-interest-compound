@@ -324,7 +324,7 @@ select:focus {
 .chart-svg .legend-contrib {
   stroke: #10b981;
   stroke-width: 1.2;
-  stroke-dasharray: 1.2 0.6;
+  stroke-dasharray: 1.55 0.55;
 }
 
 .chart-svg .tooltip-line {
