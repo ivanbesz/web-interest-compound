@@ -44,9 +44,13 @@
     "hint": "Las aportaciones empiezan a devengar interés desde el siguiente período de capitalización.",
     "initial": "Capital inicial",
     "contribution": "Aporte mensual",
+    "contributionFrequency": "Frecuencia de aportación",
+    "contributionGrowth": "Crecimiento anual de la aportación (%)",
+    "contributeAtStart": "¿Aportar al inicio del periodo?",
     "rate": "Tasa de interés anual (%)",
     "years": "Horizonte (años)",
     "frequency": "Frecuencia de capitalización",
+    "viewFrequency": "Ver resultados por",
     "frequencies": {
       "yearly": "Anualmente",
       "semiannually": "Semestralmente",
@@ -59,6 +63,7 @@
   "placeholders": {
     "initial": "Introduce tu capital inicial",
     "contribution": "Introduce el aporte mensual",
+    "contributionGrowth": "Ej. 2",
     "rate": "Ej. 6.5",
     "years": "Ej. 15"
   },

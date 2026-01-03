@@ -165,6 +165,11 @@ label.input {
   font-size: 14px;
 }
 
+label.input.checkbox {
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+
 input,
 select {
   width: 100%;
@@ -182,6 +187,12 @@ select:focus {
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+input[type='checkbox'] {
+  width: auto;
+  height: 18px;
+  padding: 0;
 }
 
 .actions {

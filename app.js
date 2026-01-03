@@ -21,6 +21,9 @@ const currencyFormatter = new Intl.NumberFormat(locale, {
 const defaultForm = () => ({
   initial: '',
   contribution: '',
+  contributionFrequency: 12,
+  contributionGrowth: 0,
+  contributeAtStart: true,
   rate: '',
   years: '',
   frequency: 1,
@@ -36,8 +39,23 @@ createApp({
 
     const results = computed(() => projectGrowth(form.value));
 
+    const displayTimeline = computed(() => {
+      const base = results.value.timeline || [];
+      const stepPerYear = results.value.stepPerYear || 1;
+      const viewFreq = Math.max(1, coerceNumber(form.value.viewFrequency, 1));
+      const interval = Math.max(1, Math.round(stepPerYear / viewFreq));
+
+      return base
+        .filter((_, idx) => idx % interval === 0 || idx === base.length - 1)
+        .map((entry, idx) => ({
+          ...entry,
+          label: idx,
+          frequency: viewFreq,
+        }));
+    });
+
     const tableRows = computed(() =>
-      results.value.timeline.slice(1).map((entry) => ({
+      displayTimeline.value.slice(1).map((entry) => ({
         ...entry,
         label: formatLabel(entry, translations.value),
       })),
@@ -90,7 +108,7 @@ createApp({
       const el = chartEl.value;
       if (!el) return;
 
-      const timeline = results.value.timeline;
+      const timeline = displayTimeline.value;
       if (!timeline.length) {
         el.innerHTML = '';
         return;
@@ -175,17 +193,36 @@ createApp({
       const legendBalance = `${legendBalanceBase} (${rateValue.toFixed(2)}%)`;
       const legendContrib =
         resolveKey(translations.value, 'chart.series.contributions') || 'Aportaciones totales';
+      const estimateTextWidth = (text) => text.length * 2.6;
+      const legendCircleDiameter = 4;
+      const legendGap = 3;
+      const legendItemSpacing = 8;
+      const legendItems = [
+        { label: legendBalance, className: 'legend-balance' },
+        { label: legendContrib, className: 'legend-contrib' },
+      ];
 
       el.innerHTML = `
         <g>${gridY}</g>
         <g>${gridX}</g>
         <polyline class="line-balance" points="${balancePolyline}" />
         <polyline class="line-contrib" points="${contribPolyline}" />
-        <g class="legend" transform="translate(${width / 2 - 24}, ${legendY})">
-          <circle cx="0" cy="0" r="2" class="legend-dot legend-balance"></circle>
-          <text x="5" y="1" class="legend-text">${legendBalance}</text>
-          <circle cx="40" cy="0" r="2" class="legend-dot legend-contrib"></circle>
-          <text x="45" y="1" class="legend-text">${legendContrib}</text>
+        <g class="legend" transform="translate(0, ${legendY})">
+          ${(() => {
+            let currentX = 0;
+            return legendItems
+              .map((item) => {
+                const textWidth = estimateTextWidth(item.label);
+                const itemWidth = legendCircleDiameter + legendGap + textWidth;
+                const markup = `<g transform="translate(${currentX},0)">
+                  <circle cx="${legendCircleDiameter / 2}" cy="0" r="2" class="legend-dot ${item.className}"></circle>
+                  <text x="${legendCircleDiameter + legendGap}" y="1" class="legend-text">${item.label}</text>
+                </g>`;
+                currentX += itemWidth + legendItemSpacing;
+                return markup;
+              })
+              .join('');
+          })()}
         </g>
         <g id="tooltip" style="display:none">
           <line class="tooltip-line" x1="0" y1="${margin.top}" x2="0" y2="${axisBottom}" />
@@ -200,6 +237,13 @@ createApp({
           </text>
         </g>
       `;
+
+      const legendGroup = el.querySelector('.legend');
+      const legendBox = legendGroup?.getBBox();
+      if (legendGroup && legendBox) {
+        const legendOffsetX = (width - legendBox.width) / 2 - legendBox.x;
+        legendGroup.setAttribute('transform', `translate(${legendOffsetX}, ${legendY})`);
+      }
 
       const tooltip = el.querySelector('#tooltip');
       const line = tooltip.querySelector('.tooltip-line');
@@ -272,7 +316,7 @@ createApp({
     };
 
     watch(
-      () => results.value,
+      () => [results.value, form.value.viewFrequency],
       () => nextTick(renderChart),
       { deep: true },
     );
@@ -379,51 +423,86 @@ function formatLabel(entry, translations) {
   return `${periodLabel} ${entry.label}`;
 }
 
-function projectGrowth({ initial, contribution, rate, years, frequency, startMonth }) {
+function projectGrowth({
+  initial,
+  contribution,
+  contributionFrequency,
+  contributionGrowth,
+  contributeAtStart,
+  rate,
+  years,
+  frequency,
+}) {
   const safeInitial = coerceNumber(initial, 0);
   const safeContribution = coerceNumber(contribution, 0);
   const safeRate = coerceNumber(rate, 0);
   const safeYears = Math.max(0, coerceNumber(years, 0));
   const safeFrequency = Math.max(1, coerceNumber(frequency, 1));
+  const safeContributionFrequency = Math.max(1, coerceNumber(contributionFrequency, 12));
+  const safeContributionGrowth = Math.max(0, coerceNumber(contributionGrowth, 0)) / 100;
+  const safeContributeAtStart = Boolean(contributeAtStart);
 
-  const periods = Math.max(0, Math.round(safeYears * safeFrequency));
+  const stepPerYear = lcm(safeFrequency, safeContributionFrequency);
+  const periods = Math.max(0, Math.round(safeYears * stepPerYear));
+  const interestInterval = Math.max(1, stepPerYear / safeFrequency);
+  const contributionInterval = Math.max(1, stepPerYear / safeContributionFrequency);
+  const perEventContribution = safeContribution;
   const periodRate = safeRate / 100 / safeFrequency;
-  const monthsPerPeriod = 12 / safeFrequency;
-  const perPeriodContribution = safeContribution * monthsPerPeriod;
-  const startDate = null;
-  const baseYear = null;
-  const baseMonth = null;
 
   const timeline = [
     {
       label: 0,
+      step: 0,
       balance: safeInitial,
       contributions: safeInitial,
       interest: 0,
-      calendarYear: baseYear,
-      calendarMonth: baseMonth,
+      calendarYear: null,
+      calendarMonth: null,
       frequency: safeFrequency,
+      stepPerYear,
     },
   ];
 
   let balance = safeInitial;
   let contributions = safeInitial;
+  let currentYear = 0;
+  let contributionPerEvent = perEventContribution;
 
   for (let period = 1; period <= periods; period += 1) {
-    balance += perPeriodContribution;
-    contributions += perPeriodContribution;
-    balance *= 1 + periodRate;
+    const periodYear = Math.floor((period - 1) / stepPerYear);
+    if (periodYear > currentYear) {
+      currentYear = periodYear;
+      contributionPerEvent *= 1 + safeContributionGrowth;
+    }
+
+    const isContributionPeriod = (period - 1) % contributionInterval === 0 && safeContribution > 0;
+    const contributionThisStep = isContributionPeriod ? contributionPerEvent : 0;
+
+    if (isContributionPeriod && safeContributeAtStart) {
+      balance += contributionThisStep;
+      contributions += contributionThisStep;
+    }
+
+    if (period % interestInterval === 0) {
+      balance *= 1 + periodRate;
+    }
+
+    if (isContributionPeriod && !safeContributeAtStart) {
+      balance += contributionThisStep;
+      contributions += contributionThisStep;
+    }
 
     const interest = Math.max(0, balance - contributions);
-    const currentDate = startDate ? addMonthsDecimal(startDate, monthsPerPeriod * period) : null;
     timeline.push({
       label: period,
+      step: period,
       balance,
       contributions,
       interest,
-      calendarYear: currentDate?.getFullYear() ?? null,
-      calendarMonth: currentDate ? currentDate.getMonth() + 1 : null,
+      calendarYear: null,
+      calendarMonth: null,
       frequency: safeFrequency,
+      stepPerYear,
     });
   }
 
@@ -436,6 +515,7 @@ function projectGrowth({ initial, contribution, rate, years, frequency, startMon
     totalContributions,
     totalInterest,
     timeline,
+    stepPerYear,
   };
 }
 
@@ -453,4 +533,21 @@ function addMonthsDecimal(date, monthsDecimal) {
   const copy = new Date(base);
   copy.setDate(copy.getDate() + extraDays);
   return copy;
+}
+
+function lcm(a, b) {
+  const safeA = Math.max(1, Math.abs(Math.round(a)));
+  const safeB = Math.max(1, Math.abs(Math.round(b)));
+  return (safeA * safeB) / gcd(safeA, safeB);
+}
+
+function gcd(a, b) {
+  let x = a;
+  let y = b;
+  while (y !== 0) {
+    const temp = y;
+    y = x % y;
+    x = temp;
+  }
+  return x;
 }
