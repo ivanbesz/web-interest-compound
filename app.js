@@ -41,6 +41,13 @@ const defaultForm = () => ({
       const errors = ref([]);
       const showAdvanced = ref(false);
       const showConsent = ref(false);
+      const education = computed(() => resolveKey(translations.value, 'education') || {});
+      const faq = computed(() => resolveKey(translations.value, 'faq') || {});
+      const glossary = computed(() => resolveKey(translations.value, 'glossary') || {});
+      const examples = computed(() => resolveKey(translations.value, 'education.examples.items') || []);
+      const tips = computed(() => resolveKey(translations.value, 'education.tips.items') || []);
+      const faqItems = computed(() => faq.value.items || []);
+      const glossaryItems = computed(() => glossary.value.items || []);
 
     const results = computed(() => projectGrowth(form.value));
 
@@ -340,22 +347,29 @@ const defaultForm = () => ({
         t,
         results,
         tableRows,
-      formatCurrency,
-      formatTerm,
-      contributionLabel,
-      contributionPlaceholder,
-      handleCalculate,
-      resetForm,
-      toggleAdvanced,
-      acceptAllCookies,
-      acceptEssential,
-      scrollTo,
-      chartEl,
-      errors,
-      ready,
-      showAdvanced,
-      showConsent,
-    };
+        formatCurrency,
+        formatTerm,
+        contributionLabel,
+        contributionPlaceholder,
+        education,
+        faq,
+        faqItems,
+        glossary,
+        glossaryItems,
+        examples,
+        tips,
+        handleCalculate,
+        resetForm,
+        toggleAdvanced,
+        acceptAllCookies,
+        acceptEssential,
+        scrollTo,
+        chartEl,
+        errors,
+        ready,
+        showAdvanced,
+        showConsent,
+      };
   },
 }).mount('#app');
 

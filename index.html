@@ -46,6 +46,9 @@
             <button type="button" class="btn ghost" @click="scrollTo('insights')">
               {{ t('actions.secondaryCta') }}
             </button>
+            <button type="button" class="btn ghost" @click="scrollTo('learn')">
+              {{ t('actions.learn') }}
+            </button>
           </div>
         </div>
         <div class="hero__card glass">
@@ -303,6 +306,89 @@
             </div>
           </article>
         </section>
+
+        <section class="panel content-block" id="learn">
+          <div class="panel__header">
+            <p class="mini-label">{{ education.label }}</p>
+            <h2>{{ education.title }}</h2>
+            <p class="mini-lede">{{ education.intro }}</p>
+          </div>
+          <div class="panel__body info-grid">
+            <article class="info-card">
+              <p class="mini-label">{{ education.label }}</p>
+              <h3>{{ education.principles && education.principles.title }}</h3>
+              <ul class="info-list">
+                <li v-for="item in (education.principles && education.principles.items) || []" :key="item.title">
+                  <strong>{{ item.title }}</strong>
+                  <p class="mini-lede">{{ item.copy }}</p>
+                </li>
+              </ul>
+            </article>
+            <article class="info-card">
+              <p class="mini-label">{{ education.label }}</p>
+              <h3>{{ education.steps && education.steps.title }}</h3>
+              <ol class="numbered-list">
+                <li v-for="item in (education.steps && education.steps.items) || []" :key="item.title">
+                  <strong>{{ item.title }}</strong>
+                  <p class="mini-lede">{{ item.copy }}</p>
+                </li>
+              </ol>
+            </article>
+            <article class="info-card">
+              <p class="mini-label">{{ education.label }}</p>
+              <h3>{{ education.tips && education.tips.title }}</h3>
+              <ul class="info-list">
+                <li v-for="tip in tips" :key="tip">
+                  <p class="mini-lede">{{ tip }}</p>
+                </li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel content-block" id="examples">
+          <div class="panel__header">
+            <p class="mini-label">{{ (education.examples && education.examples.label) || education.label }}</p>
+            <h2>{{ education.examples && education.examples.title }}</h2>
+            <p class="mini-lede">{{ education.examples && education.examples.copy }}</p>
+          </div>
+          <div class="panel__body example-grid">
+            <article class="example-card" v-for="item in examples" :key="item.title">
+              <p class="mini-label">{{ education.examples && education.examples.label }}</p>
+              <h3>{{ item.title }}</h3>
+              <p class="mini-lede">{{ item.goal }}</p>
+              <p class="tip" v-if="item.tip"><strong>Consejo:</strong> {{ item.tip }}</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel content-block" id="faq">
+          <div class="panel__header">
+            <p class="mini-label">{{ faq.label }}</p>
+            <h2>{{ faq.title }}</h2>
+            <p class="mini-lede">{{ faq.intro }}</p>
+          </div>
+          <div class="panel__body faq">
+            <div class="faq__item" v-for="item in faqItems" :key="item.q">
+              <h3>{{ item.q }}</h3>
+              <p class="mini-lede">{{ item.a }}</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel content-block" id="glossary">
+          <div class="panel__header">
+            <p class="mini-label">{{ glossary.label }}</p>
+            <h2>{{ glossary.title }}</h2>
+            <p class="mini-lede">{{ glossary.intro }}</p>
+          </div>
+          <div class="panel__body glossary-grid">
+            <div class="glossary__item" v-for="item in glossaryItems" :key="item.term">
+              <h4>{{ item.term }}</h4>
+              <p class="mini-lede">{{ item.def }}</p>
+            </div>
+          </div>
+        </section>
       </main>
 
       <footer class="footer">
@@ -338,6 +424,6 @@
       </div>
     </div>
 
-    <script type="module" src="app.js?v=19"></script>
+    <script type="module" src="app.js?v=20"></script>
   </body>
 </html>

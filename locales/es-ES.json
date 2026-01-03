@@ -9,6 +9,7 @@
   "actions": {
     "primaryCta": "Comenzar cálculo",
     "secondaryCta": "Ver proyección",
+    "learn": "Abrir guía rápida",
     "calculate": "Calcular",
     "reset": "Restablecer",
     "showAdvanced": "Más opciones",
@@ -94,6 +95,142 @@
       "balance": "Balance futuro",
       "contributions": "Aportaciones totales"
     }
+  },
+  "education": {
+    "label": "Aprende",
+    "title": "Guía rápida sobre interés compuesto",
+    "intro": "Refuerza los conceptos clave y usa la calculadora con parámetros realistas antes de tomar decisiones.",
+    "principles": {
+      "title": "Conceptos clave",
+      "items": [
+        {
+          "title": "Interés sobre interés",
+          "copy": "Cada periodo los intereses se suman al capital y generan nuevos intereses. Cuanto más largo el plazo y mayor la frecuencia de capitalización, más pronunciada es la curva."
+        },
+        {
+          "title": "Aportaciones constantes",
+          "copy": "Aportar pequeñas cantidades de forma regular pesa más que buscar la tasa perfecta. Prioriza la constancia y automatiza aportes."
+        },
+        {
+          "title": "Tasa realista",
+          "copy": "La tasa anual es una estimación. Usa valores conservadores y recuerda que rendimientos pasados no garantizan resultados futuros."
+        },
+        {
+          "title": "Tiempo y disciplina",
+          "copy": "El tiempo es el factor más poderoso. Empezar antes y mantener el plan suele compensar pequeñas variaciones de la tasa."
+        }
+      ]
+    },
+    "steps": {
+      "title": "Cómo usar la calculadora",
+      "items": [
+        {
+          "title": "Define tu punto de partida",
+          "copy": "Introduce capital inicial, aporte periódico y frecuencia. Si no aportas, deja el aporte a cero."
+        },
+        {
+          "title": "Ajusta la tasa y capitalización",
+          "copy": "Elige una tasa anual estimada y la frecuencia con la que se capitalizan los intereses (mensual suele ser un buen punto de partida)."
+        },
+        {
+          "title": "Proyecta el horizonte",
+          "copy": "Selecciona los años y la vista del resultado (anual, trimestral, mensual) para ver el detalle que necesitas."
+        },
+        {
+          "title": "Itera con escenarios",
+          "copy": "Usa el crecimiento de aportación para simular subidas salariales y compara cambios de tasa o plazo para ver su impacto."
+        }
+      ]
+    },
+    "tips": {
+      "title": "Consejos prácticos",
+      "items": [
+        "Usa una tasa conservadora si estás empezando; es preferible quedarte corto a generar expectativas irreales.",
+        "Simula la inflación restando unos puntos a la tasa de rentabilidad que esperas obtener.",
+        "Si tienes aportes fijos, prueba a aumentarlos un 2-3% anual para imitar subidas de ingresos.",
+        "Revisa la vista anual o trimestral para detectar saltos en intereses y aportes a lo largo del tiempo."
+      ]
+    },
+    "examples": {
+      "label": "Casos prácticos",
+      "title": "Ejemplos rápidos",
+      "copy": "Prueba estos escenarios y ajusta los números a tu situación.",
+      "items": [
+        {
+          "title": "Ahorro mensual disciplinado",
+          "goal": "200 € al mes durante 10 años con una tasa estimada del 5% y aportes al inicio de cada periodo.",
+          "tip": "Activa “Aportar al inicio” y prueba un crecimiento de aportes del 2% anual para simular mejoras salariales."
+        },
+        {
+          "title": "Inversión inicial sin aportes",
+          "goal": "5.000 € iniciales al 8% anual durante 15 años para ver el efecto del tiempo sin aportaciones adicionales.",
+          "tip": "Compara capitalización anual frente a mensual para ver cómo cambia el balance final."
+        },
+        {
+          "title": "Plan mixto a largo plazo",
+          "goal": "1.500 € iniciales + 100 € al mes, crecimiento de aportación del 3% anual, horizonte de 20 años y tasa estimada del 6%.",
+          "tip": "Cambia la frecuencia de visualización a trimestral para observar la curva y la relación entre aportes e intereses."
+        }
+      ]
+    }
+  },
+  "faq": {
+    "label": "Preguntas frecuentes",
+    "title": "Dudas habituales",
+    "intro": "Resuelve dudas comunes antes de proyectar tus números.",
+    "items": [
+      {
+        "q": "¿Qué tasa de interés usar?",
+        "a": "Elige una tasa prudente basada en productos comparables. Para inversiones en bolsa a largo plazo, usar entre 4% y 7% suele ser razonable; para cuentas remuneradas, consulta la TAE que ofrece tu entidad."
+      },
+      {
+        "q": "¿Cómo considerar la inflación?",
+        "a": "Puedes restar la inflación estimada a la tasa que esperas obtener o usar una tasa más baja en la calculadora. Así verás el crecimiento en términos reales."
+      },
+      {
+        "q": "¿Qué significa capitalizar con mayor frecuencia?",
+        "a": "Capitalizar más veces al año hace que los intereses se sumen antes y generen nuevo interés. Mensual o trimestral es habitual en cuentas y fondos; anual es conservador."
+      },
+      {
+        "q": "¿Para qué sirve “Aportar al inicio del periodo”?",
+        "a": "Si activas esta opción, cada aportación entra antes de calcular el interés del periodo, por lo que genera intereses durante todo ese intervalo."
+      },
+      {
+        "q": "¿Los resultados están garantizados?",
+        "a": "No. Es una simulación educativa basada en los parámetros que introduces. No sustituye asesoramiento financiero profesional."
+      }
+    ]
+  },
+  "glossary": {
+    "label": "Glosario",
+    "title": "Términos clave",
+    "intro": "Conceptos básicos que verás en el cálculo y en tus productos financieros.",
+    "items": [
+      {
+        "term": "Capital inicial",
+        "def": "Dinero con el que empiezas a invertir o ahorrar antes de realizar nuevas aportaciones."
+      },
+      {
+        "term": "Aportación periódica",
+        "def": "Cantidad fija que añades cada periodo (mes, trimestre, año) para aumentar tu capital."
+      },
+      {
+        "term": "Crecimiento de aportación",
+        "def": "Incremento porcentual anual que aplicas a tus aportes para simular subidas de ingresos o ahorro progresivo."
+      },
+      {
+        "term": "Tasa anual",
+        "def": "Porcentaje estimado de rentabilidad o interés que esperas obtener en un año."
+      },
+      {
+        "term": "Frecuencia de capitalización",
+        "def": "Número de veces por año que los intereses se añaden al capital. A mayor frecuencia, mayor efecto compuesto."
+      },
+      {
+        "term": "Horizonte temporal",
+        "def": "Tiempo en años que mantendrás la inversión o el plan de ahorro."
+      }
+    ]
   },
   "table": {
     "label": "Detalle",
