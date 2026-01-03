@@ -10,7 +10,7 @@ import {
 
 const locale = 'es-ES';
 const canonicalUrl = 'https://blwond.github.io/web-interest-compound/';
-let chartInstance;
+let chartInstance = null;
 
 const currencyFormatter = new Intl.NumberFormat(locale, {
   style: 'currency',
@@ -23,8 +23,7 @@ const defaultForm = () => ({
   contribution: '',
   rate: '',
   years: '',
-  frequency: 12,
-  startMonth: getDefaultStartMonth(),
+  frequency: 1,
 });
 
 createApp({
@@ -92,69 +91,172 @@ createApp({
       if (!el) return;
 
       const timeline = results.value.timeline;
-      const labels = timeline.map((item) => formatLabel(item, translations.value));
-
-      const dataset = {
-        labels,
-        datasets: [
-          {
-            label: resolveKey(translations.value, 'chart.series.balance') || 'Balance',
-            data: timeline.map((item) => item.balance),
-            fill: true,
-            borderColor: '#66e0d2',
-            backgroundColor: 'rgba(102, 224, 210, 0.15)',
-            tension: 0.25,
-          },
-          {
-            label: resolveKey(translations.value, 'chart.series.contributions') || 'Contributions',
-            data: timeline.map((item) => item.contributions),
-            fill: false,
-            borderColor: '#7da6ff',
-            backgroundColor: '#7da6ff',
-            tension: 0.25,
-            borderDash: [6, 6],
-          },
-        ],
-      };
-
-      if (chartInstance) {
-        chartInstance.data = dataset;
-        chartInstance.update();
+      if (!timeline.length) {
+        el.innerHTML = '';
         return;
       }
 
-      chartInstance = new Chart(el, {
-        type: 'line',
-        data: dataset,
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              labels: { color: '#e8ecf8' },
-            },
-            tooltip: {
-              callbacks: {
-                label: (context) => {
-                  const label = context.dataset.label || '';
-                  const value = context.parsed.y;
-                  return `${label}: ${formatCurrency(value)}`;
-                },
-              },
-            },
-          },
-          scales: {
-            x: {
-              ticks: { color: '#a4acc7' },
-              grid: { color: 'rgba(255,255,255,0.05)' },
-            },
-            y: {
-              ticks: { color: '#a4acc7' },
-              grid: { color: 'rgba(255,255,255,0.05)' },
-            },
-          },
-        },
+      const balances = timeline.map((item) => item.balance);
+      const contributions = timeline.map((item) => item.contributions);
+      const realMax = Math.max(...balances, ...contributions);
+      const hasSeries = Number.isFinite(realMax) && realMax > 0 && timeline.length > 1;
+      const maxValue = Math.max(Number.isFinite(realMax) ? realMax : 0, 1);
+
+      const margin = { top: 8, right: 6, bottom: 22, left: 18 };
+      const width = 120;
+      const height = 80;
+      const axisBottom = height - margin.bottom;
+      const axisLabelY = axisBottom + 8;
+      const legendY = axisLabelY + 8;
+      const innerWidth = width - margin.left - margin.right;
+      const innerHeight = axisBottom - margin.top;
+
+      const scaleX = (idx) =>
+        margin.left + (idx / Math.max(timeline.length - 1, 1)) * innerWidth;
+      const scaleY = (value) => margin.top + innerHeight - (value / maxValue) * innerHeight;
+
+      const points = timeline.map((item, idx) => {
+        const x = scaleX(idx);
+        return {
+          x,
+          yBalance: scaleY(item.balance),
+          yContrib: scaleY(item.contributions),
+          label: formatLabel(item, translations.value),
+          balance: item.balance,
+          contributions: item.contributions,
+        };
       });
+
+      const balancePolyline = points.map((p) => `${p.x},${p.yBalance}`).join(' ');
+      const contribPolyline = points.map((p) => `${p.x},${p.yContrib}`).join(' ');
+
+      const gridY = Array.from({ length: 5 })
+        .map((_, i) => {
+          const yVal = (i / 4) * maxValue;
+          const y = scaleY(yVal);
+          const label = formatCurrency(yVal);
+          return `<g class="grid">
+            <line x1="${margin.left}" y1="${y}" x2="${width - margin.right}" y2="${y}" />
+            <text class="axis-text" x="4" y="${y + 3}">${label}</text>
+          </g>`;
+        })
+        .join('');
+
+      const xTicks = Math.min(6, timeline.length);
+      const step = Math.max(1, Math.floor(timeline.length / xTicks));
+      const gridX = timeline
+        .map((item, idx) => ({ item, idx }))
+        .filter(({ idx }) => idx % step === 0 || idx === timeline.length - 1)
+        .map(({ item, idx }) => {
+          const x = scaleX(idx);
+          const label = formatLabel(item, translations.value);
+          return `<g class="grid">
+            <line x1="${x}" y1="${margin.top}" x2="${x}" y2="${axisBottom}" />
+            <text class="axis-text" x="${x}" y="${axisLabelY}" text-anchor="middle">${label}</text>
+          </g>`;
+        })
+        .join('');
+
+      const legendBalanceBase =
+        resolveKey(translations.value, 'chart.series.balance') || 'Balance futuro';
+      const rateValue = coerceNumber(form.value.rate, 0);
+      const legendBalance = `${legendBalanceBase} (${rateValue.toFixed(2)}%)`;
+      const legendContrib =
+        resolveKey(translations.value, 'chart.series.contributions') || 'Aportaciones totales';
+
+      el.innerHTML = `
+        <g>${gridY}</g>
+        <g>${gridX}</g>
+        <polyline class="line-balance" points="${balancePolyline}" />
+        <polyline class="line-contrib" points="${contribPolyline}" />
+        <g class="legend" transform="translate(${width / 2 - 24}, ${legendY})">
+          <circle cx="0" cy="0" r="2" class="legend-dot legend-balance"></circle>
+          <text x="5" y="1" class="legend-text">${legendBalance}</text>
+          <circle cx="40" cy="0" r="2" class="legend-dot legend-contrib"></circle>
+          <text x="45" y="1" class="legend-text">${legendContrib}</text>
+        </g>
+        <g id="tooltip" style="display:none">
+          <line class="tooltip-line" x1="0" y1="${margin.top}" x2="0" y2="${axisBottom}" />
+          <circle class="tooltip-dot" r="1.4" cx="0" cy="0" />
+          <rect class="tooltip-box" x="0" y="0" width="68" height="18"></rect>
+          <circle class="tooltip-dot-balance" r="1" cx="0" cy="0"></circle>
+          <circle class="tooltip-dot-contrib" r="1" cx="0" cy="0"></circle>
+          <text class="tooltip-text" x="0" y="0">
+            <tspan id="tooltip-label" x="0" dy="4"></tspan>
+            <tspan id="tooltip-balance" x="0" dy="6"></tspan>
+            <tspan id="tooltip-contrib" x="0" dy="6"></tspan>
+          </text>
+        </g>
+      `;
+
+      const tooltip = el.querySelector('#tooltip');
+      const line = tooltip.querySelector('.tooltip-line');
+      const dot = tooltip.querySelector('.tooltip-dot');
+      const box = tooltip.querySelector('.tooltip-box');
+      const labelEl = tooltip.querySelector('#tooltip-label');
+      const balEl = tooltip.querySelector('#tooltip-balance');
+      const contribEl = tooltip.querySelector('#tooltip-contrib');
+      const dotBal = tooltip.querySelector('.tooltip-dot-balance');
+      const dotContrib = tooltip.querySelector('.tooltip-dot-contrib');
+
+      const updateTooltip = (clientX) => {
+        const rect = el.getBoundingClientRect();
+        const relX = ((clientX - rect.left) / rect.width) * width;
+        let nearest = points[0];
+        let minDist = Infinity;
+        points.forEach((p) => {
+          const dist = Math.abs(p.x - relX);
+          if (dist < minDist) {
+            minDist = dist;
+            nearest = p;
+          }
+        });
+
+        const x = nearest.x;
+        const y = nearest.yBalance;
+        line.setAttribute('x1', x);
+        line.setAttribute('x2', x);
+        dot.setAttribute('cx', x);
+        dot.setAttribute('cy', y);
+
+        labelEl.textContent = nearest.label;
+        balEl.textContent = `${legendBalance}: ${formatCurrency(nearest.balance)}`;
+        contribEl.textContent = `${legendContrib}: ${formatCurrency(nearest.contributions)}`;
+
+        const boxWidth = 68;
+        const boxHeight = 18;
+        const boxX = Math.min(Math.max(x + 1, margin.left), width - margin.right - boxWidth);
+        const boxY = Math.max(y - boxHeight, margin.top);
+        box.setAttribute('x', boxX);
+        box.setAttribute('y', boxY);
+        box.setAttribute('width', boxWidth);
+        box.setAttribute('height', boxHeight);
+        labelEl.setAttribute('x', boxX + 2);
+        labelEl.setAttribute('y', boxY + 4);
+        balEl.setAttribute('x', boxX + 6);
+        balEl.setAttribute('y', boxY + 9);
+        contribEl.setAttribute('x', boxX + 6);
+        contribEl.setAttribute('y', boxY + 14);
+
+        dotBal.setAttribute('cx', boxX + 2.5);
+        dotBal.setAttribute('cy', boxY + 8.5);
+        dotContrib.setAttribute('cx', boxX + 2.5);
+        dotContrib.setAttribute('cy', boxY + 13.5);
+
+        tooltip.style.display = 'block';
+      };
+
+      if (hasSeries) {
+        el.onmousemove = (e) => updateTooltip(e.clientX);
+        el.onmouseleave = () => {
+          tooltip.style.display = 'none';
+        };
+        updateTooltip(el.getBoundingClientRect().left);
+      } else {
+        tooltip.style.display = 'none';
+        el.onmousemove = null;
+        el.onmouseleave = null;
+      }
     };
 
     watch(
@@ -240,9 +342,7 @@ function resolveKey(tree, path) {
 }
 
 function getDefaultStartMonth() {
-  const now = new Date();
-  const month = `${now.getMonth() + 1}`.padStart(2, '0');
-  return `${now.getFullYear()}-${month}`;
+  return '';
 }
 
 function addMonths(date, months) {
@@ -252,11 +352,18 @@ function addMonths(date, months) {
 }
 
 function formatLabel(entry, translations) {
-  if (entry.calendarYear && entry.calendarMonth) {
-    const monthLabel = resolveKey(translations, 'common.monthLabel') || 'Month';
-    return `${monthLabel} ${entry.calendarMonth}/${entry.calendarYear}`;
+  const freq = Number(entry.frequency || 0);
+  const periods = resolveKey(translations, 'common.periods') || {};
+  if (freq === 1) {
+    const yearLabel = resolveKey(translations, 'table.year') || 'Año';
+    return `${yearLabel} ${entry.label}`;
   }
-  const periodLabel = resolveKey(translations, 'common.periodLabel') || 'Period';
+  if (freq === 2) return `${periods.semester || 'Semestre'} ${entry.label}`;
+  if (freq === 4) return `${periods.quarter || 'Trimestre'} ${entry.label}`;
+  if (freq === 12) return `${periods.month || 'Mes'} ${entry.label}`;
+  if (freq === 52) return `${periods.week || 'Semana'} ${entry.label}`;
+  if (freq === 365) return `${periods.day || 'Día'} ${entry.label}`;
+  const periodLabel = resolveKey(translations, 'common.periodLabel') || 'Periodo';
   return `${periodLabel} ${entry.label}`;
 }
 
@@ -271,9 +378,9 @@ function projectGrowth({ initial, contribution, rate, years, frequency, startMon
   const periodRate = safeRate / 100 / safeFrequency;
   const monthsPerPeriod = 12 / safeFrequency;
   const perPeriodContribution = safeContribution * monthsPerPeriod;
-  const startDate = startMonth ? new Date(`${startMonth}-01`) : null;
-  const baseYear = Number.isFinite(startDate?.getFullYear()) ? startDate.getFullYear() : null;
-  const baseMonth = Number.isFinite(startDate?.getMonth()) ? startDate.getMonth() + 1 : null;
+  const startDate = null;
+  const baseYear = null;
+  const baseMonth = null;
 
   const timeline = [
     {
@@ -283,6 +390,7 @@ function projectGrowth({ initial, contribution, rate, years, frequency, startMon
       interest: 0,
       calendarYear: baseYear,
       calendarMonth: baseMonth,
+      frequency: safeFrequency,
     },
   ];
 
@@ -303,6 +411,7 @@ function projectGrowth({ initial, contribution, rate, years, frequency, startMon
       interest,
       calendarYear: currentDate?.getFullYear() ?? null,
       calendarMonth: currentDate ? currentDate.getMonth() + 1 : null,
+      frequency: safeFrequency,
     });
   }
 

@@ -16,6 +16,11 @@
     <meta property="og:locale" content="es_ES" />
     <meta property="twitter:card" content="summary_large_image" />
     <script id="structuredData" type="application/ld+json"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"
+      integrity="sha256-TvSIkAn3Zbs6k8ZZrVSu2Ce279b9Ec/WWEDuJeayQMk="
+      crossorigin="anonymous"
+    ></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -23,11 +28,6 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
-    <script
-      src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"
-      integrity="sha256-TvSIkAn3Zbs6k8ZZrVSu2Ce279b9Ec/WWEDuJeayQMk="
-      crossorigin="anonymous"
-    ></script>
     <script
       async
       src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXX"
@@ -164,10 +164,6 @@
                   <option value="365">{{ t('form.frequencies.daily') }}</option>
                 </select>
               </label>
-              <label class="input">
-                <span>{{ t('form.start') }}</span>
-                <input type="month" v-model="form.startMonth" :aria-label="t('form.start')" />
-              </label>
             </div>
             <div class="actions">
               <button class="btn primary" type="button" @click="handleCalculate">
@@ -183,7 +179,7 @@
           </div>
         </section>
 
-        <section class="grid" id="insights">
+        <section class="insights-grid" id="insights">
           <article class="card summary">
             <div class="card__header">
               <p class="mini-label">{{ t('summary.label') }}</p>
@@ -205,15 +201,7 @@
             </div>
           </article>
 
-          <article class="card chart-card">
-            <div class="card__header">
-              <p class="mini-label">{{ t('chart.label') }}</p>
-              <h3>{{ t('chart.title') }}</h3>
-            </div>
-            <canvas ref="chartEl" :aria-label="t('chart.aria')" role="img"></canvas>
-          </article>
-
-          <article class="card table-card">
+          <article class="card table-card table-card--wide">
             <div class="card__header">
               <p class="mini-label">{{ t('table.label') }}</p>
               <h3>{{ t('table.title') }}</h3>
@@ -238,6 +226,21 @@
                 </tbody>
               </table>
             </div>
+          </article>
+
+          <article class="card chart-card chart-card--full">
+            <div class="card__header">
+              <p class="mini-label">{{ t('chart.label') }}</p>
+              <h3>{{ t('chart.title') }}</h3>
+            </div>
+            <svg
+              ref="chartEl"
+              class="chart-svg"
+              viewBox="0 0 120 80"
+              preserveAspectRatio="none"
+              :aria-label="t('chart.aria')"
+              role="img"
+            ></svg>
           </article>
         </section>
       </main>

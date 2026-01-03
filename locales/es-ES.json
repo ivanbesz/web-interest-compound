@@ -24,7 +24,14 @@
     "years": "años",
     "yearLabel": "Año",
     "monthLabel": "Mes",
-    "periodLabel": "Periodo"
+    "periodLabel": "Periodo",
+    "periods": {
+      "semester": "Semestre",
+      "quarter": "Trimestre",
+      "month": "Mes",
+      "week": "Semana",
+      "day": "Día"
+    }
   },
   "ads": {
     "label": "Publicidad",
@@ -40,7 +47,6 @@
     "rate": "Tasa de interés anual (%)",
     "years": "Horizonte (años)",
     "frequency": "Frecuencia de capitalización",
-    "start": "Mes de inicio",
     "frequencies": {
       "yearly": "Anualmente",
       "semiannually": "Semestralmente",
@@ -68,8 +74,8 @@
     "title": "Balance y aportes",
     "aria": "Gráfico de proyección",
     "series": {
-      "balance": "Balance",
-      "contributions": "Aportes"
+      "balance": "Balance futuro",
+      "contributions": "Aportaciones totales"
     }
   },
   "table": {

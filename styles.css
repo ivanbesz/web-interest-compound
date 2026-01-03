@@ -216,10 +216,11 @@ select:focus {
   transform: translateY(-1px);
 }
 
-.grid {
+.insights-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: 1fr 2fr;
   gap: 12px;
+  align-items: stretch;
 }
 
 .card {
@@ -228,6 +229,9 @@ select:focus {
   border-radius: var(--radius);
   padding: 14px;
   box-shadow: var(--shadow);
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
 }
 
 .card__header h3 {
@@ -239,6 +243,13 @@ select:focus {
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 10px;
   margin-top: 12px;
+}
+
+.summary,
+.table-card--wide {
+  min-height: 380px;
+  max-height: 380px;
+  height: 100%;
 }
 
 .stat {
@@ -254,13 +265,100 @@ select:focus {
   font-weight: 700;
 }
 
-.chart-card {
-  min-height: 320px;
+.table-card--wide {
+  grid-column: 2 / span 1;
 }
 
-.chart-card canvas {
+.chart-card {
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chart-card .chart-svg {
   width: 100%;
   height: 100%;
+  flex: 1;
+  display: block;
+  min-height: 220px;
+}
+
+.chart-svg .grid line {
+  stroke: #e5e7eb;
+  stroke-width: 0.25;
+}
+
+.chart-svg .axis-text {
+  font-size: 2.2px;
+  fill: #6b7280;
+}
+
+.chart-svg .line-balance {
+  fill: none;
+  stroke: #2563eb;
+  stroke-width: 1;
+}
+
+.chart-svg .line-contrib {
+  fill: none;
+  stroke: #10b981;
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+
+.chart-svg .legend-text {
+  font-size: 2.2px;
+  fill: #4b5563;
+}
+
+.chart-svg .legend-dot {
+  fill: none;
+}
+
+.chart-svg .legend-balance {
+  stroke: #2563eb;
+  stroke-width: 1.2;
+}
+
+.chart-svg .legend-contrib {
+  stroke: #10b981;
+  stroke-width: 1.2;
+  stroke-dasharray: 1.2 0.6;
+}
+
+.chart-svg .tooltip-line {
+  stroke: #9ca3af;
+  stroke-width: 0.5;
+  stroke-dasharray: 3 3;
+}
+
+.chart-svg .tooltip-dot {
+  fill: #2563eb;
+  stroke: #fff;
+  stroke-width: 0.4;
+}
+.chart-svg .tooltip-dot-balance {
+  fill: #2563eb;
+}
+.chart-svg .tooltip-dot-contrib {
+  fill: #10b981;
+}
+
+.chart-svg .tooltip-box {
+  fill: #fff;
+  stroke: #e5e7eb;
+  stroke-width: 0.4;
+  rx: 1;
+}
+
+.chart-svg .tooltip-text {
+  font-size: 2.4px;
+  fill: #1f2933;
+}
+
+.chart-card--full {
+  grid-column: 1 / -1;
 }
 
 .table-card table {
@@ -282,6 +380,10 @@ select:focus {
   font-size: 12px;
   color: var(--muted);
   letter-spacing: 0.05em;
+  position: sticky;
+  top: 0;
+  background: var(--card);
+  z-index: 1;
 }
 
 .table-card tbody tr:nth-child(odd) {
@@ -293,8 +395,9 @@ select:focus {
 }
 
 .table-responsive {
-  max-height: 380px;
+  max-height: 300px;
   overflow: auto;
+  flex: 1;
 }
 
 .footer {
@@ -327,16 +430,16 @@ select:focus {
   color: #b42318;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 900px) {
   body {
     padding: 18px 14px 24px;
   }
 
-  .grid {
+  .insights-grid {
     grid-template-columns: 1fr;
   }
 
-  .hero {
-    grid-template-columns: 1fr;
+  .table-card--wide {
+    grid-column: 1;
   }
 }
