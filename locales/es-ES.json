@@ -112,7 +112,106 @@
   "footer": {
     "label": "Nota",
     "disclaimer": "Esta herramienta es solo informativa y no sustituye asesoramiento financiero. Ajusta tasas y aportaciones para aproximarlas a tu realidad.",
-    "meta": "Hecho para visualizar tu crecimiento."
+    "meta": "Hecho para visualizar tu crecimiento.",
+    "privacy": "Privacidad",
+    "cookies": "Cookies",
+    "legal": "Aviso legal"
+  },
+  "cookies": {
+    "title": "Usamos cookies",
+    "copy": "Solo empleamos cookies esenciales para operar el sitio y mostrar los anuncios de forma adecuada.",
+    "acceptAll": "Aceptar todas",
+    "acceptEssential": "Rechazar"
+  },
+  "policy": {
+    "common": {
+      "back": "Volver"
+    },
+    "privacy": {
+      "label": "Privacidad",
+      "title": "Política de privacidad",
+      "subtitle": "Información sobre cómo tratamos tus datos y los de terceros.",
+      "responsible": {
+        "title": "Responsable",
+        "body": "Titular: Ivan Bes Zamorano.<br />Contacto: ivan.bes@interescompuesto.es, Zaragoza (50015), España."
+      },
+      "purpose": {
+        "title": "Finalidad del sitio",
+        "body": "Esta web ofrece una calculadora de interés compuesto financiada mediante publicidad. No solicitamos datos personales."
+      },
+      "data": {
+        "title": "Datos que tratamos",
+        "items": [
+          "Datos técnicos de navegación (IP, agente de usuario) de forma transitoria para prestar el servicio.",
+          "Datos de terceros (Google AdSense) para mostrar y medir publicidad. Consulta la política de Google: https://policies.google.com/technologies/ads?hl=es"
+        ]
+      },
+      "legalBasis": {
+        "title": "Base jurídica",
+        "body": "Interés legítimo en el funcionamiento técnico del sitio y consentimiento del usuario para cookies/publicidad no esenciales."
+      },
+      "rights": {
+        "title": "Derechos",
+        "body": "Puedes ejercer acceso, rectificación, supresión y demás derechos escribiendo a ivan.bes@interescompuesto.es."
+      },
+      "retention": {
+        "title": "Conservación",
+        "body": "No almacenamos datos personales propios. Los datos de terceros siguen sus plazos de retención."
+      },
+      "cookies": {
+        "title": "Cookies y terceros",
+        "body": "Usamos cookies esenciales y, con tu consentimiento, cookies de publicidad (AdSense). Gestiona tu preferencia en el banner o desde tu navegador. Más detalle en la Política de cookies."
+      }
+    },
+    "cookiesPage": {
+      "label": "Cookies",
+      "title": "Política de cookies",
+      "subtitle": "Qué cookies usamos, para qué y cómo gestionarlas.",
+      "what": {
+        "title": "¿Qué son las cookies?",
+        "body": "Archivos pequeños que se almacenan en tu navegador y permiten el funcionamiento básico del sitio o la prestación de publicidad."
+      },
+      "used": {
+        "title": "Cookies que usamos",
+        "items": [
+          "<strong>Esenciales:</strong> necesarias para cargar la web y recordar tu preferencia de consentimiento.",
+          "<strong>Publicidad (AdSense):</strong> usadas por Google para mostrar y medir anuncios. Más información: https://policies.google.com/technologies/ads?hl=es"
+        ]
+      },
+      "consent": {
+        "title": "Cómo gestionar tu consentimiento",
+        "body": "En el banner puedes aceptar todas o rechazar (solo esenciales). También puedes borrar o bloquear cookies desde la configuración de tu navegador."
+      },
+      "duration": {
+        "title": "Duración",
+        "body": "Las cookies esenciales duran lo necesario para la sesión o para recordar tu preferencia. Las de terceros siguen sus propios plazos."
+      }
+    },
+    "legal": {
+      "label": "Aviso legal",
+      "title": "Aviso legal",
+      "subtitle": "Información exigida por la LSSI y condiciones de uso.",
+      "owner": {
+        "title": "Identificación del titular",
+        "body": "Titular: Ivan Bes Zamorano.<br />Contacto: ivan.bes@interescompuesto.es, Zaragoza (50015), España."
+      },
+      "purpose": {
+        "title": "Objeto del sitio",
+        "body": "Calculadora de interés compuesto con fines informativos y orientativos, financiada mediante publicidad."
+      },
+      "terms": {
+        "title": "Condiciones de uso",
+        "body": "La herramienta no constituye asesoramiento financiero. El usuario es responsable de las decisiones tomadas con los resultados."
+      },
+      "ip": {
+        "title": "Propiedad intelectual",
+        "body": "El código, diseño y textos de esta web pertenecen a Ivan Bes Zamorano. Se prohíbe la reproducción no autorizada."
+      },
+      "liability": {
+        "title": "Responsabilidad",
+        "body": "No nos hacemos responsables del uso que se haga de las estimaciones ni de daños derivados de decisiones basadas en ellas."
+      }
+    }
   },
   "errors": {
     "initial": "La inversión inicial es obligatoria y no puede ser negativa.",

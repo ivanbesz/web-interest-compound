@@ -38,6 +38,7 @@ createApp({
     const ready = ref(false);
     const errors = ref([]);
     const showAdvanced = ref(false);
+    const showConsent = ref(false);
 
     const results = computed(() => projectGrowth(form.value));
 
@@ -131,6 +132,18 @@ createApp({
     const toggleAdvanced = () => {
       showAdvanced.value = !showAdvanced.value;
     };
+
+    const setConsent = (value) => {
+      try {
+        localStorage.setItem('cookieConsent', value);
+      } catch (err) {
+        console.warn('Unable to persist cookie consent', err);
+      }
+      showConsent.value = false;
+    };
+
+    const acceptAllCookies = () => setConsent('all');
+    const acceptEssential = () => setConsent('essential');
 
     const scrollTo = (id) => {
       document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
@@ -359,6 +372,13 @@ createApp({
       ready.value = true;
       applyMetaTranslations(translations.value);
       renderChart();
+      try {
+        const stored = localStorage.getItem('cookieConsent');
+        showConsent.value = stored !== 'all' && stored !== 'essential';
+      } catch (err) {
+        console.warn('Unable to read cookie consent', err);
+        showConsent.value = true;
+      }
     });
 
     return {
@@ -373,11 +393,14 @@ createApp({
       handleCalculate,
       resetForm,
       toggleAdvanced,
+      acceptAllCookies,
+      acceptEssential,
       scrollTo,
       chartEl,
       errors,
       ready,
       showAdvanced,
+      showConsent,
     };
   },
 }).mount('#app');

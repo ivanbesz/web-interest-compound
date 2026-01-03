@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aviso legal | Calculadora interés compuesto</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="policy-page" data-page="legal">
+      <header class="policy-header">
+        <div>
+          <p class="mini-label" id="legal-label"></p>
+          <h1 id="legal-title"></h1>
+          <p class="mini-lede" id="legal-subtitle"></p>
+        </div>
+        <a class="btn ghost" href="index.html" id="legal-back"></a>
+      </header>
+
+      <section class="policy-block">
+        <h2 id="legal-owner-title"></h2>
+        <p id="legal-owner-body"></p>
+      </section>
+
+      <section class="policy-block">
+        <h2 id="legal-purpose-title"></h2>
+        <p id="legal-purpose-body"></p>
+      </section>
+
+      <section class="policy-block">
+        <h2 id="legal-terms-title"></h2>
+        <p id="legal-terms-body"></p>
+      </section>
+
+      <section class="policy-block">
+        <h2 id="legal-ip-title"></h2>
+        <p id="legal-ip-body"></p>
+      </section>
+
+      <section class="policy-block">
+        <h2 id="legal-liability-title"></h2>
+        <p id="legal-liability-body"></p>
+      </section>
+    </main>
+    <script>
+      (async () => {
+        const get = (obj, path) =>
+          path.split('.').reduce((acc, part) => (acc && acc[part] !== undefined ? acc[part] : null), obj);
+        try {
+          const res = await fetch('locales/es-ES.json');
+          const t = await res.json();
+          const setText = (id, key) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = get(t, key) || '';
+          };
+          const setHTML = (id, key) => {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = get(t, key) || '';
+          };
+
+          setText('legal-label', 'policy.legal.label');
+          setText('legal-title', 'policy.legal.title');
+          setText('legal-subtitle', 'policy.legal.subtitle');
+          setText('legal-back', 'policy.common.back');
+          setText('legal-owner-title', 'policy.legal.owner.title');
+          setHTML('legal-owner-body', 'policy.legal.owner.body');
+          setText('legal-purpose-title', 'policy.legal.purpose.title');
+          setHTML('legal-purpose-body', 'policy.legal.purpose.body');
+          setText('legal-terms-title', 'policy.legal.terms.title');
+          setHTML('legal-terms-body', 'policy.legal.terms.body');
+          setText('legal-ip-title', 'policy.legal.ip.title');
+          setHTML('legal-ip-body', 'policy.legal.ip.body');
+          setText('legal-liability-title', 'policy.legal.liability.title');
+          setHTML('legal-liability-body', 'policy.legal.liability.body');
+        } catch (err) {
+          console.error('Unable to load translations', err);
+        }
+      })();
+    </script>
+  </body>
+</html>

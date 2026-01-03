@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Política de privacidad | Calculadora interés compuesto</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="policy-page" data-page="privacy">
+      <header class="policy-header">
+        <div>
+          <p class="mini-label" id="privacy-label"></p>
+          <h1 id="privacy-title"></h1>
+          <p class="mini-lede" id="privacy-subtitle"></p>
+        </div>
+        <a class="btn ghost" href="index.html" id="privacy-back"></a>
+      </header>
+
+      <section class="policy-block">
+        <h2 id="privacy-resp-title"></h2>
+        <p id="privacy-resp-body"></p>
+      </section>
+
+      <section class="policy-block">
+        <h2 id="privacy-purpose-title"></h2>
+        <p id="privacy-purpose-body"></p>
+      </section>
+
+      <section class="policy-block">
+        <h2 id="privacy-data-title"></h2>
+        <ul id="privacy-data-list"></ul>
+      </section>
+
+      <section class="policy-block">
+        <h2 id="privacy-legal-title"></h2>
+        <p id="privacy-legal-body"></p>
+      </section>
+
+      <section class="policy-block">
+        <h2 id="privacy-rights-title"></h2>
+        <p id="privacy-rights-body"></p>
+      </section>
+
+      <section class="policy-block">
+        <h2 id="privacy-retention-title"></h2>
+        <p id="privacy-retention-body"></p>
+      </section>
+
+      <section class="policy-block">
+        <h2 id="privacy-cookies-title"></h2>
+        <p id="privacy-cookies-body"></p>
+      </section>
+    </main>
+    <script>
+      (async () => {
+        const get = (obj, path) =>
+          path.split('.').reduce((acc, part) => (acc && acc[part] !== undefined ? acc[part] : null), obj);
+        try {
+          const res = await fetch('locales/es-ES.json');
+          const t = await res.json();
+          const setText = (id, key) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = get(t, key) || '';
+          };
+          const setHTML = (id, key) => {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = get(t, key) || '';
+          };
+          const setList = (id, key) => {
+            const el = document.getElementById(id);
+            const items = get(t, key);
+            if (el && Array.isArray(items)) el.innerHTML = items.map((i) => `<li>${i}</li>`).join('');
+          };
+
+          setText('privacy-label', 'policy.privacy.label');
+          setText('privacy-title', 'policy.privacy.title');
+          setText('privacy-subtitle', 'policy.privacy.subtitle');
+          setText('privacy-back', 'policy.common.back');
+          setText('privacy-resp-title', 'policy.privacy.responsible.title');
+          setHTML('privacy-resp-body', 'policy.privacy.responsible.body');
+          setText('privacy-purpose-title', 'policy.privacy.purpose.title');
+          setHTML('privacy-purpose-body', 'policy.privacy.purpose.body');
+          setText('privacy-data-title', 'policy.privacy.data.title');
+          setList('privacy-data-list', 'policy.privacy.data.items');
+          setText('privacy-legal-title', 'policy.privacy.legalBasis.title');
+          setHTML('privacy-legal-body', 'policy.privacy.legalBasis.body');
+          setText('privacy-rights-title', 'policy.privacy.rights.title');
+          setHTML('privacy-rights-body', 'policy.privacy.rights.body');
+          setText('privacy-retention-title', 'policy.privacy.retention.title');
+          setHTML('privacy-retention-body', 'policy.privacy.retention.body');
+          setText('privacy-cookies-title', 'policy.privacy.cookies.title');
+          setHTML('privacy-cookies-body', 'policy.privacy.cookies.body');
+        } catch (err) {
+          console.error('Unable to load translations', err);
+        }
+      })();
+    </script>
+  </body>
+</html>

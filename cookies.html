@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Política de cookies | Calculadora interés compuesto</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="policy-page" data-page="cookies">
+      <header class="policy-header">
+        <div>
+          <p class="mini-label" id="cookies-label"></p>
+          <h1 id="cookies-title"></h1>
+          <p class="mini-lede" id="cookies-subtitle"></p>
+        </div>
+        <a class="btn ghost" href="index.html" id="cookies-back"></a>
+      </header>
+
+      <section class="policy-block">
+        <h2 id="cookies-what-title"></h2>
+        <p id="cookies-what-body"></p>
+      </section>
+
+      <section class="policy-block">
+        <h2 id="cookies-used-title"></h2>
+        <ul id="cookies-used-list"></ul>
+      </section>
+
+      <section class="policy-block">
+        <h2 id="cookies-consent-title"></h2>
+        <p id="cookies-consent-body"></p>
+      </section>
+
+      <section class="policy-block">
+        <h2 id="cookies-duration-title"></h2>
+        <p id="cookies-duration-body"></p>
+      </section>
+    </main>
+    <script>
+      (async () => {
+        const get = (obj, path) =>
+          path.split('.').reduce((acc, part) => (acc && acc[part] !== undefined ? acc[part] : null), obj);
+        try {
+          const res = await fetch('locales/es-ES.json');
+          const t = await res.json();
+          const setText = (id, key) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = get(t, key) || '';
+          };
+          const setHTML = (id, key) => {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = get(t, key) || '';
+          };
+          const setList = (id, key) => {
+            const el = document.getElementById(id);
+            const items = get(t, key);
+            if (el && Array.isArray(items)) el.innerHTML = items.map((i) => `<li>${i}</li>`).join('');
+          };
+
+          setText('cookies-label', 'policy.cookiesPage.label');
+          setText('cookies-title', 'policy.cookiesPage.title');
+          setText('cookies-subtitle', 'policy.cookiesPage.subtitle');
+          setText('cookies-back', 'policy.common.back');
+          setText('cookies-what-title', 'policy.cookiesPage.what.title');
+          setHTML('cookies-what-body', 'policy.cookiesPage.what.body');
+          setText('cookies-used-title', 'policy.cookiesPage.used.title');
+          setList('cookies-used-list', 'policy.cookiesPage.used.items');
+          setText('cookies-consent-title', 'policy.cookiesPage.consent.title');
+          setHTML('cookies-consent-body', 'policy.cookiesPage.consent.body');
+          setText('cookies-duration-title', 'policy.cookiesPage.duration.title');
+          setHTML('cookies-duration-body', 'policy.cookiesPage.duration.body');
+        } catch (err) {
+          console.error('Unable to load translations', err);
+        }
+      })();
+    </script>
+  </body>
+</html>

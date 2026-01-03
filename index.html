@@ -30,7 +30,7 @@
     <link rel="stylesheet" href="styles.css" />
     <script
       async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXX"
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1136851555905555"
       crossorigin="anonymous"
     ></script>
   </head>
@@ -80,7 +80,7 @@
             style="display: block"
             data-ad-format="auto"
             data-full-width-responsive="true"
-            data-ad-client="ca-pub-XXXXXXXXXXXXXXX"
+            data-ad-client="ca-pub-1136851555905555"
             data-ad-slot="0000000000"
           ></ins>
           <script>
@@ -298,8 +298,28 @@
         </div>
         <div class="footer__meta">
           <p class="mini-lede">{{ t('footer.meta') }}</p>
+          <nav class="footer__links">
+            <a href="privacidad.html">{{ t('footer.privacy') }}</a>
+            <a href="cookies.html">{{ t('footer.cookies') }}</a>
+            <a href="aviso-legal.html">{{ t('footer.legal') }}</a>
+          </nav>
         </div>
       </footer>
+
+      <div class="cookie-banner" v-if="showConsent">
+        <div>
+          <p class="cookie-title">{{ t('cookies.title') }}</p>
+          <p class="cookie-copy">{{ t('cookies.copy') }}</p>
+        </div>
+        <div class="cookie-actions">
+          <button class="btn ghost" type="button" @click="acceptEssential">
+            {{ t('cookies.acceptEssential') }}
+          </button>
+          <button class="btn primary" type="button" @click="acceptAllCookies">
+            {{ t('cookies.acceptAll') }}
+          </button>
+        </div>
+      </div>
     </div>
 
     <script type="module" src="app.js"></script>
