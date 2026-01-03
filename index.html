@@ -118,41 +118,15 @@
                 />
               </label>
               <label class="input">
-                <span>{{ t('form.contribution') }}</span>
+                <span>{{ contributionLabel }}</span>
                 <input
                   type="number"
                   inputmode="decimal"
                   min="0"
                   v-model.number="form.contribution"
-                  :placeholder="t('placeholders.contribution')"
-                  :aria-label="t('form.contribution')"
+                  :placeholder="contributionPlaceholder"
+                  :aria-label="contributionLabel"
                 />
-              </label>
-              <label class="input">
-                <span>{{ t('form.contributionFrequency') }}</span>
-                <select v-model.number="form.contributionFrequency" :aria-label="t('form.contributionFrequency')">
-                  <option value="1">{{ t('form.frequencies.yearly') }}</option>
-                  <option value="2">{{ t('form.frequencies.semiannually') }}</option>
-                  <option value="4">{{ t('form.frequencies.quarterly') }}</option>
-                  <option value="12">{{ t('form.frequencies.monthly') }}</option>
-                  <option value="52">{{ t('form.frequencies.weekly') }}</option>
-                </select>
-              </label>
-              <label class="input">
-                <span>{{ t('form.contributionGrowth') }}</span>
-                <input
-                  type="number"
-                  inputmode="decimal"
-                  step="0.1"
-                  min="0"
-                  v-model.number="form.contributionGrowth"
-                  :placeholder="t('placeholders.contributionGrowth')"
-                  :aria-label="t('form.contributionGrowth')"
-                />
-              </label>
-              <label class="input checkbox">
-                <span>{{ t('form.contributeAtStart') }}</span>
-                <input type="checkbox" v-model="form.contributeAtStart" :aria-label="t('form.contributeAtStart')" />
               </label>
               <label class="input">
                 <span>{{ t('form.rate') }} <span class="required">*</span></span>
@@ -179,28 +153,61 @@
                   required
                 />
               </label>
-              <label class="input">
-                <span>{{ t('form.frequency') }}</span>
-                <select v-model.number="form.frequency" :aria-label="t('form.frequency')">
-                  <option value="1">{{ t('form.frequencies.yearly') }}</option>
-                  <option value="2">{{ t('form.frequencies.semiannually') }}</option>
-                  <option value="4">{{ t('form.frequencies.quarterly') }}</option>
-                  <option value="12">{{ t('form.frequencies.monthly') }}</option>
-                  <option value="52">{{ t('form.frequencies.weekly') }}</option>
-                  <option value="365">{{ t('form.frequencies.daily') }}</option>
-                </select>
-              </label>
-              <label class="input">
-                <span>{{ t('form.viewFrequency') }}</span>
-                <select v-model.number="form.viewFrequency" :aria-label="t('form.viewFrequency')">
-                  <option value="1">{{ t('form.frequencies.yearly') }}</option>
-                  <option value="2">{{ t('form.frequencies.semiannually') }}</option>
-                  <option value="4">{{ t('form.frequencies.quarterly') }}</option>
-                  <option value="12">{{ t('form.frequencies.monthly') }}</option>
-                  <option value="52">{{ t('form.frequencies.weekly') }}</option>
-                  <option value="365">{{ t('form.frequencies.daily') }}</option>
-                </select>
-              </label>
+            </div>
+            <button class="btn ghost advanced-toggle" type="button" @click="toggleAdvanced">
+              {{ showAdvanced ? t('actions.hideAdvanced') : t('actions.showAdvanced') }}
+            </button>
+            <div class="advanced" :class="{ 'advanced--open': showAdvanced }">
+              <div class="advanced__content inputs-grid">
+                <label class="input">
+                  <span>{{ t('form.contributionFrequency') }}</span>
+                  <select v-model.number="form.contributionFrequency" :aria-label="t('form.contributionFrequency')">
+                    <option value="1">{{ t('form.frequencies.yearly') }}</option>
+                    <option value="2">{{ t('form.frequencies.semiannually') }}</option>
+                    <option value="4">{{ t('form.frequencies.quarterly') }}</option>
+                    <option value="12">{{ t('form.frequencies.monthly') }}</option>
+                    <option value="52">{{ t('form.frequencies.weekly') }}</option>
+                  </select>
+                </label>
+                <label class="input">
+                  <span>{{ t('form.contributionGrowth') }}</span>
+                  <input
+                    type="number"
+                    inputmode="decimal"
+                    step="0.1"
+                    min="0"
+                    v-model.number="form.contributionGrowth"
+                    :placeholder="t('placeholders.contributionGrowth')"
+                    :aria-label="t('form.contributionGrowth')"
+                  />
+                </label>
+                <label class="input">
+                  <span>{{ t('form.frequency') }}</span>
+                  <select v-model.number="form.frequency" :aria-label="t('form.frequency')">
+                    <option value="1">{{ t('form.frequencies.yearly') }}</option>
+                    <option value="2">{{ t('form.frequencies.semiannually') }}</option>
+                    <option value="4">{{ t('form.frequencies.quarterly') }}</option>
+                    <option value="12">{{ t('form.frequencies.monthly') }}</option>
+                    <option value="52">{{ t('form.frequencies.weekly') }}</option>
+                    <option value="365">{{ t('form.frequencies.daily') }}</option>
+                  </select>
+                </label>
+                <label class="input">
+                  <span>{{ t('form.viewFrequency') }}</span>
+                  <select v-model.number="form.viewFrequency" :aria-label="t('form.viewFrequency')">
+                    <option value="1">{{ t('form.frequencies.yearly') }}</option>
+                    <option value="2">{{ t('form.frequencies.semiannually') }}</option>
+                    <option value="4">{{ t('form.frequencies.quarterly') }}</option>
+                    <option value="12">{{ t('form.frequencies.monthly') }}</option>
+                    <option value="52">{{ t('form.frequencies.weekly') }}</option>
+                    <option value="365">{{ t('form.frequencies.daily') }}</option>
+                  </select>
+                </label>
+                <label class="input checkbox">
+                  <span>{{ t('form.contributeAtStart') }}</span>
+                  <input type="checkbox" v-model="form.contributeAtStart" :aria-label="t('form.contributeAtStart')" />
+                </label>
+              </div>
             </div>
             <div class="actions">
               <button class="btn primary" type="button" @click="handleCalculate">

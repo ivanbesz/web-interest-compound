@@ -27,6 +27,7 @@ const defaultForm = () => ({
   rate: '',
   years: '',
   frequency: 1,
+  viewFrequency: 1,
 });
 
 createApp({
@@ -36,6 +37,7 @@ createApp({
     const chartEl = ref(null);
     const ready = ref(false);
     const errors = ref([]);
+    const showAdvanced = ref(false);
 
     const results = computed(() => projectGrowth(form.value));
 
@@ -62,6 +64,33 @@ createApp({
     );
 
     const t = (key) => resolveKey(translations.value, key) || '';
+
+    const contributionPeriod = computed(() => {
+      const freq = Number(form.value.contributionFrequency);
+      const periodNames = resolveKey(translations.value, 'common.periodNames') || {};
+      if (freq === 1) return periodNames.yearly || 'anual';
+      if (freq === 2) return periodNames.semiannually || 'semestral';
+      if (freq === 4) return periodNames.quarterly || 'trimestral';
+      if (freq === 12) return periodNames.monthly || 'mensual';
+      if (freq === 52) return periodNames.weekly || 'semanal';
+      if (freq === 365) return periodNames.daily || 'diario';
+      return resolveKey(translations.value, 'common.periodLabel') || 'periodo';
+    });
+
+    const contributionLabel = computed(() => {
+      const base = resolveKey(translations.value, 'form.contributionBase') || 'Aporte';
+      const period = contributionPeriod.value;
+      return `${base} ${String(period).toLowerCase()}`;
+    });
+
+    const contributionPlaceholder = computed(() => {
+      const base =
+        resolveKey(translations.value, 'placeholders.contributionBase') ||
+        resolveKey(translations.value, 'placeholders.contribution') ||
+        'Introduce tu aporte';
+      const period = contributionPeriod.value;
+      return `${base} ${String(period).toLowerCase()}`;
+    });
 
     const formatCurrency = (value) => currencyFormatter.format(value || 0);
 
@@ -97,6 +126,10 @@ createApp({
       form.value = defaultForm();
       errors.value = [];
       renderChart();
+    };
+
+    const toggleAdvanced = () => {
+      showAdvanced.value = !showAdvanced.value;
     };
 
     const scrollTo = (id) => {
@@ -335,12 +368,16 @@ createApp({
       tableRows,
       formatCurrency,
       formatTerm,
+      contributionLabel,
+      contributionPlaceholder,
       handleCalculate,
       resetForm,
+      toggleAdvanced,
       scrollTo,
       chartEl,
       errors,
       ready,
+      showAdvanced,
     };
   },
 }).mount('#app');

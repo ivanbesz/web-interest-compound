@@ -195,6 +195,27 @@ input[type='checkbox'] {
   padding: 0;
 }
 
+.advanced-toggle {
+  margin-top: 10px;
+}
+
+.advanced {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.25s ease, opacity 0.25s ease;
+}
+
+.advanced--open {
+  max-height: 800px;
+  opacity: 1;
+  margin-top: 10px;
+}
+
+.advanced__content {
+  padding-top: 6px;
+}
+
 .actions {
   margin-top: 12px;
   display: flex;
