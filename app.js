@@ -6,6 +6,7 @@ import {
   watch,
   nextTick,
   onMounted,
+  onBeforeUnmount,
 } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.prod.js';
 
 const locale = 'es-ES';
@@ -30,15 +31,16 @@ const defaultForm = () => ({
   viewFrequency: 1,
 });
 
-createApp({
-  setup() {
-    const translations = ref({});
-    const form = ref(defaultForm());
-    const chartEl = ref(null);
-    const ready = ref(false);
-    const errors = ref([]);
-    const showAdvanced = ref(false);
-    const showConsent = ref(false);
+  createApp({
+    setup() {
+      const translations = ref({});
+      const form = ref(defaultForm());
+      const chartEl = ref(null);
+      let resizeObserver = null;
+      const ready = ref(false);
+      const errors = ref([]);
+      const showAdvanced = ref(false);
+      const showConsent = ref(false);
 
     const results = computed(() => projectGrowth(form.value));
 
@@ -149,217 +151,147 @@ createApp({
       document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
     };
 
-    const renderChart = () => {
-      if (errors.value.length) return;
-      const el = chartEl.value;
-      if (!el) return;
+      const renderChart = () => {
+        if (errors.value.length) return;
+        const canvas = chartEl.value;
+        if (!canvas) return;
 
-      const timeline = displayTimeline.value;
-      if (!timeline.length) {
-        el.innerHTML = '';
-        return;
-      }
-
-      const balances = timeline.map((item) => item.balance);
-      const contributions = timeline.map((item) => item.contributions);
-      const realMax = Math.max(...balances, ...contributions);
-      const hasSeries = Number.isFinite(realMax) && realMax > 0 && timeline.length > 1;
-      const safeContribution = coerceNumber(form.value.contribution, 0);
-      const safeInitial = coerceNumber(form.value.initial, 0);
-      const totalContributions = timeline[timeline.length - 1]?.contributions ?? 0;
-
-      let baseMax;
-      if (safeContribution > 0) {
-        const candidate = Math.max(realMax, totalContributions);
-        baseMax = Math.ceil(candidate / 1000) * 1000;
-      } else {
-        baseMax = Math.max(realMax, safeInitial * 10);
-      }
-
-      const maxValue = Math.max(Number.isFinite(baseMax) ? baseMax : 0, 1);
-
-      const margin = { top: 8, right: 6, bottom: 24, left: 18 };
-      const width = 120;
-      const height = 80;
-      const axisBottom = height - margin.bottom;
-      const axisLabelY = axisBottom + 8;
-      const legendY = axisLabelY + 10;
-      const innerWidth = width - margin.left - margin.right;
-      const innerHeight = axisBottom - margin.top;
-
-      const scaleX = (idx) =>
-        margin.left + (idx / Math.max(timeline.length - 1, 1)) * innerWidth;
-      const scaleY = (value) => margin.top + innerHeight - (value / maxValue) * innerHeight;
-
-      const points = timeline.map((item, idx) => {
-        const x = scaleX(idx);
-        return {
-          x,
-          yBalance: scaleY(item.balance),
-          yContrib: scaleY(item.contributions),
-          label: formatLabel(item, translations.value),
-          balance: item.balance,
-          contributions: item.contributions,
-        };
-      });
-
-      const balancePolyline = points.map((p) => `${p.x},${p.yBalance}`).join(' ');
-      const contribPolyline = points.map((p) => `${p.x},${p.yContrib}`).join(' ');
-
-      const gridY = Array.from({ length: 5 })
-        .map((_, i) => {
-          const yVal = (i / 4) * maxValue;
-          const y = scaleY(yVal);
-          const label = formatCurrency(yVal);
-          return `<g class="grid">
-            <line x1="${margin.left}" y1="${y}" x2="${width - margin.right}" y2="${y}" />
-            <text class="axis-text" x="4" y="${y + 3}">${label}</text>
-          </g>`;
-        })
-        .join('');
-
-      const xTicks = Math.min(6, timeline.length);
-      const step = Math.max(1, Math.floor(timeline.length / xTicks));
-      const gridX = timeline
-        .map((item, idx) => ({ item, idx }))
-        .filter(({ idx }) => idx % step === 0 || idx === timeline.length - 1)
-        .map(({ item, idx }) => {
-          const x = scaleX(idx);
-          const label = formatLabel(item, translations.value);
-          return `<g class="grid">
-            <line x1="${x}" y1="${margin.top}" x2="${x}" y2="${axisBottom}" />
-            <text class="axis-text" x="${x}" y="${axisLabelY}" text-anchor="middle">${label}</text>
-          </g>`;
-        })
-        .join('');
-
-      const legendBalanceBase =
-        resolveKey(translations.value, 'chart.series.balance') || 'Balance futuro';
-      const rateValue = coerceNumber(form.value.rate, 0);
-      const legendBalance = `${legendBalanceBase} (${rateValue.toFixed(2)}%)`;
-      const legendContrib =
-        resolveKey(translations.value, 'chart.series.contributions') || 'Aportaciones totales';
-      const estimateTextWidth = (text) => text.length * 2.6;
-      const legendCircleDiameter = 4;
-      const legendGap = 3;
-      const legendItemSpacing = 8;
-      const legendItems = [
-        { label: legendBalance, className: 'legend-balance' },
-        { label: legendContrib, className: 'legend-contrib' },
-      ];
-
-      el.innerHTML = `
-        <g>${gridY}</g>
-        <g>${gridX}</g>
-        <polyline class="line-balance" points="${balancePolyline}" />
-        <polyline class="line-contrib" points="${contribPolyline}" />
-        <g class="legend" transform="translate(0, ${legendY})">
-          ${(() => {
-            let currentX = 0;
-            return legendItems
-              .map((item) => {
-                const textWidth = estimateTextWidth(item.label);
-                const itemWidth = legendCircleDiameter + legendGap + textWidth;
-                const markup = `<g transform="translate(${currentX},0)">
-                  <circle cx="${legendCircleDiameter / 2}" cy="0" r="2" class="legend-dot ${item.className}"></circle>
-                  <text x="${legendCircleDiameter + legendGap}" y="1" class="legend-text">${item.label}</text>
-                </g>`;
-                currentX += itemWidth + legendItemSpacing;
-                return markup;
-              })
-              .join('');
-          })()}
-        </g>
-        <g id="tooltip" style="display:none">
-          <line class="tooltip-line" x1="0" y1="${margin.top}" x2="0" y2="${axisBottom}" />
-          <circle class="tooltip-dot" r="1.4" cx="0" cy="0" />
-          <rect class="tooltip-box" x="0" y="0" width="68" height="18"></rect>
-          <circle class="tooltip-dot-balance" r="1" cx="0" cy="0"></circle>
-          <circle class="tooltip-dot-contrib" r="1" cx="0" cy="0"></circle>
-          <text class="tooltip-text" x="0" y="0">
-            <tspan id="tooltip-label" x="0" dy="4"></tspan>
-            <tspan id="tooltip-balance" x="0" dy="6"></tspan>
-            <tspan id="tooltip-contrib" x="0" dy="6"></tspan>
-          </text>
-        </g>
-      `;
-
-      const legendGroup = el.querySelector('.legend');
-      const legendBox = legendGroup?.getBBox();
-      if (legendGroup && legendBox) {
-        const legendOffsetX = (width - legendBox.width) / 2 - legendBox.x;
-        legendGroup.setAttribute('transform', `translate(${legendOffsetX}, ${legendY})`);
-      }
-
-      const tooltip = el.querySelector('#tooltip');
-      const line = tooltip.querySelector('.tooltip-line');
-      const dot = tooltip.querySelector('.tooltip-dot');
-      const box = tooltip.querySelector('.tooltip-box');
-      const labelEl = tooltip.querySelector('#tooltip-label');
-      const balEl = tooltip.querySelector('#tooltip-balance');
-      const contribEl = tooltip.querySelector('#tooltip-contrib');
-      const dotBal = tooltip.querySelector('.tooltip-dot-balance');
-      const dotContrib = tooltip.querySelector('.tooltip-dot-contrib');
-
-      const updateTooltip = (clientX) => {
-        const rect = el.getBoundingClientRect();
-        const relX = ((clientX - rect.left) / rect.width) * width;
-        let nearest = points[0];
-        let minDist = Infinity;
-        points.forEach((p) => {
-          const dist = Math.abs(p.x - relX);
-          if (dist < minDist) {
-            minDist = dist;
-            nearest = p;
+        const timeline = displayTimeline.value;
+        if (!timeline.length) {
+          if (chartInstance) {
+            chartInstance.destroy();
+            chartInstance = null;
           }
+          return;
+        }
+
+        const labels = timeline.map((entry) => formatLabel(entry, translations.value));
+        const balances = timeline.map((item) => item.balance);
+        const contributions = timeline.map((item) => item.contributions);
+
+        const legendBalanceBase =
+          resolveKey(translations.value, 'chart.series.balance') || 'Balance futuro';
+        const rateValue = coerceNumber(form.value.rate, 0);
+        const legendBalance = `${legendBalanceBase} (${rateValue.toFixed(2)}%)`;
+        const legendContrib =
+          resolveKey(translations.value, 'chart.series.contributions') || 'Aportaciones totales';
+
+        // Check context
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        if (typeof Chart === 'undefined') {
+          console.warn('Chart.js not loaded');
+          return;
+        }
+
+        const parentWidth = canvas.parentElement?.clientWidth || canvas.clientWidth || 800;
+        const isNarrow = parentWidth < 640;
+
+        // Common options generator based on current width
+        const getOptions = () => ({
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: false,
+          layout: {
+            padding: {
+              top: isNarrow ? 12 : 20,
+              right: isNarrow ? 10 : 20,
+              bottom: isNarrow ? 12 : 12,
+              left: isNarrow ? 0 : 0,
+            },
+          },
+          interaction: { mode: 'nearest', intersect: false },
+          plugins: {
+            legend: {
+              display: true,
+              position: 'bottom',
+              padding: isNarrow ? 14 : 30,
+              labels: {
+                usePointStyle: true,
+                boxWidth: isNarrow ? 10 : 12,
+                boxHeight: isNarrow ? 10 : 12,
+                padding: isNarrow ? 10 : 20,
+                font: { size: isNarrow ? 11 : 12 },
+              },
+            },
+            tooltip: {
+              callbacks: {
+                title(context) {
+                  return context[0]?.label || '';
+                },
+                label(context) {
+                  const value = context.parsed.y ?? 0;
+                  return `${context.dataset.label}: ${formatCurrency(value)}`;
+                },
+              },
+            },
+          },
+          scales: {
+            x: {
+              offset: true,
+              grid: { color: 'rgba(0, 0, 0, 0.04)' },
+              ticks: {
+                maxRotation: 0,
+                autoSkip: true,
+                maxTicksLimit: isNarrow ? 4 : 8,
+                color: '#4b5563',
+                font: { size: 11 },
+              },
+            },
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(0, 0, 0, 0.04)' },
+              ticks: {
+                color: '#4b5563',
+                font: { size: 11 },
+                maxTicksLimit: 6,
+                callback: (value) => currencyFormatter.format(value),
+              },
+            },
+          },
         });
 
-        const x = nearest.x;
-        const y = nearest.yBalance;
-        line.setAttribute('x1', x);
-        line.setAttribute('x2', x);
-        dot.setAttribute('cx', x);
-        dot.setAttribute('cy', y);
-
-        labelEl.textContent = nearest.label;
-        balEl.textContent = `${legendBalance}: ${formatCurrency(nearest.balance)}`;
-        contribEl.textContent = `${legendContrib}: ${formatCurrency(nearest.contributions)}`;
-
-        const boxWidth = 68;
-        const boxHeight = 18;
-        const boxX = Math.min(Math.max(x + 1, margin.left), width - margin.right - boxWidth);
-        const boxY = Math.max(y - boxHeight, margin.top);
-        box.setAttribute('x', boxX);
-        box.setAttribute('y', boxY);
-        box.setAttribute('width', boxWidth);
-        box.setAttribute('height', boxHeight);
-        labelEl.setAttribute('x', boxX + 2);
-        labelEl.setAttribute('y', boxY + 4);
-        balEl.setAttribute('x', boxX + 6);
-        balEl.setAttribute('y', boxY + 9);
-        contribEl.setAttribute('x', boxX + 6);
-        contribEl.setAttribute('y', boxY + 14);
-
-        dotBal.setAttribute('cx', boxX + 2.5);
-        dotBal.setAttribute('cy', boxY + 8.5);
-        dotContrib.setAttribute('cx', boxX + 2.5);
-        dotContrib.setAttribute('cy', boxY + 13.5);
-
-        tooltip.style.display = 'block';
+        if (chartInstance) {
+          chartInstance.data.labels = labels;
+          chartInstance.data.datasets[0].data = balances;
+          chartInstance.data.datasets[0].label = legendBalance;
+          chartInstance.data.datasets[1].data = contributions;
+          chartInstance.data.datasets[1].label = legendContrib;
+          chartInstance.options = getOptions();
+          chartInstance.update('none'); // Update without animation
+        } else {
+          chartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels,
+              datasets: [
+                {
+                  label: legendBalance,
+                  data: balances,
+                  borderColor: '#2563eb',
+                  backgroundColor: 'rgba(37, 99, 235, 0.12)',
+                  tension: 0.15,
+                  pointRadius: 3,
+                  pointHoverRadius: 5,
+                  fill: false,
+                },
+                {
+                  label: legendContrib,
+                  data: contributions,
+                  borderColor: '#10b981',
+                  backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                  borderDash: [6, 4],
+                  tension: 0.15,
+                  pointRadius: 3,
+                  pointHoverRadius: 5,
+                  fill: false,
+                },
+              ],
+            },
+            options: getOptions(),
+          });
+        }
       };
-
-      if (hasSeries) {
-        el.onmousemove = (e) => updateTooltip(e.clientX);
-        el.onmouseleave = () => {
-          tooltip.style.display = 'none';
-        };
-        updateTooltip(el.getBoundingClientRect().left);
-      } else {
-        tooltip.style.display = 'none';
-        el.onmousemove = null;
-        el.onmouseleave = null;
-      }
-    };
 
     watch(
       () => [results.value, form.value.viewFrequency],
@@ -367,25 +299,47 @@ createApp({
       { deep: true },
     );
 
-    onMounted(async () => {
-      await loadTranslations(translations);
-      ready.value = true;
-      applyMetaTranslations(translations.value);
-      renderChart();
-      try {
-        const stored = localStorage.getItem('cookieConsent');
-        showConsent.value = stored !== 'all' && stored !== 'essential';
-      } catch (err) {
-        console.warn('Unable to read cookie consent', err);
-        showConsent.value = true;
-      }
-    });
+      onMounted(async () => {
+        await loadTranslations(translations);
+        ready.value = true;
+        applyMetaTranslations(translations.value);
+        renderChart();
+        const container = chartEl.value?.parentElement;
+        if (container && typeof ResizeObserver !== 'undefined') {
+          let resizeTimer;
+          resizeObserver = new ResizeObserver(() => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+              requestAnimationFrame(renderChart);
+            }, 100);
+          });
+          resizeObserver.observe(container);
+        }
+        try {
+          const stored = localStorage.getItem('cookieConsent');
+          showConsent.value = stored !== 'all' && stored !== 'essential';
+        } catch (err) {
+          console.warn('Unable to read cookie consent', err);
+          showConsent.value = true;
+        }
+      });
 
-    return {
-      form,
-      t,
-      results,
-      tableRows,
+      onBeforeUnmount(() => {
+        if (resizeObserver) {
+          resizeObserver.disconnect();
+          resizeObserver = null;
+        }
+        if (chartInstance) {
+          chartInstance.destroy();
+          chartInstance = null;
+        }
+      });
+
+      return {
+        form,
+        t,
+        results,
+        tableRows,
       formatCurrency,
       formatTerm,
       contributionLabel,
