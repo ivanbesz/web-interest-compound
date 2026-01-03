@@ -102,15 +102,24 @@ createApp({
       const hasSeries = Number.isFinite(realMax) && realMax > 0 && timeline.length > 1;
       const safeContribution = coerceNumber(form.value.contribution, 0);
       const safeInitial = coerceNumber(form.value.initial, 0);
-      const baseMax = safeContribution > 0 ? realMax : Math.max(realMax, safeInitial * 10);
+      const totalContributions = timeline[timeline.length - 1]?.contributions ?? 0;
+
+      let baseMax;
+      if (safeContribution > 0) {
+        const candidate = Math.max(realMax, totalContributions);
+        baseMax = Math.ceil(candidate / 1000) * 1000;
+      } else {
+        baseMax = Math.max(realMax, safeInitial * 10);
+      }
+
       const maxValue = Math.max(Number.isFinite(baseMax) ? baseMax : 0, 1);
 
-      const margin = { top: 8, right: 6, bottom: 22, left: 18 };
+      const margin = { top: 8, right: 6, bottom: 24, left: 18 };
       const width = 120;
       const height = 80;
       const axisBottom = height - margin.bottom;
       const axisLabelY = axisBottom + 8;
-      const legendY = axisLabelY + 8;
+      const legendY = axisLabelY + 10;
       const innerWidth = width - margin.left - margin.right;
       const innerHeight = axisBottom - margin.top;
 
