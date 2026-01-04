@@ -362,6 +362,34 @@
           </div>
         </section>
 
+        <section class="panel content-block" id="learn-more">
+          <div class="panel__header">
+            <p class="mini-label">{{ t('articles.index.label') }}</p>
+            <h2>{{ t('articles.index.title') }}</h2>
+            <p class="mini-lede">{{ t('articles.index.subtitle') }}</p>
+          </div>
+          <div class="panel__body info-grid">
+            <article class="info-card">
+              <p class="mini-label">{{ t('articles.compoundInterest.hero.eyebrow') }}</p>
+              <h3><a class="card-link" href="que-es-el-interes-compuesto.html">{{ t('articles.compoundInterest.hero.title') }}</a></h3>
+              <p class="mini-lede">{{ t('articles.compoundInterest.meta.description') }}</p>
+              <a href="que-es-el-interes-compuesto.html" class="btn ghost info-card__cta">{{ t('articles.common.readMore') }}</a>
+            </article>
+            <article class="info-card">
+              <p class="mini-label">{{ t('articles.ruleOf72.hero.eyebrow') }}</p>
+              <h3><a class="card-link" href="regla-del-72.html">{{ t('articles.ruleOf72.hero.title') }}</a></h3>
+              <p class="mini-lede">{{ t('articles.ruleOf72.meta.description') }}</p>
+              <a href="regla-del-72.html" class="btn ghost info-card__cta">{{ t('articles.common.readMore') }}</a>
+            </article>
+            <article class="info-card">
+              <p class="mini-label">{{ t('articles.longTermStrategies.hero.eyebrow') }}</p>
+              <h3><a class="card-link" href="estrategias-inversion-largo-plazo.html">{{ t('articles.longTermStrategies.hero.title') }}</a></h3>
+              <p class="mini-lede">{{ t('articles.longTermStrategies.meta.description') }}</p>
+              <a href="estrategias-inversion-largo-plazo.html" class="btn ghost info-card__cta">{{ t('articles.common.readMore') }}</a>
+            </article>
+          </div>
+        </section>
+
         <section class="panel content-block" id="faq">
           <div class="panel__header">
             <p class="mini-label">{{ faq.label }}</p>
@@ -399,8 +427,7 @@
           </p>
         </div>
         <div class="footer__meta">
-          <p class="mini-lede">{{ t('footer.meta') }}</p>
-          <nav class="footer__links">
+          <nav class="footer__links footer__links--articles">
             <a href="privacidad.html">{{ t('footer.privacy') }}</a>
             <a href="cookies.html">{{ t('footer.cookies') }}</a>
             <a href="aviso-legal.html">{{ t('footer.legal') }}</a>
