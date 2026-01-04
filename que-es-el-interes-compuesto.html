@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>¿Qué es el interés compuesto?</title>
+    <meta name="description" content="Artículo sobre interés compuesto" />
+    <meta name="robots" content="index,follow" />
+    <meta name="theme-color" content="#0c1021" />
+    <link rel="canonical" href="https://blwond.github.io/web-interest-compound/que-es-el-interes-compuesto.html" />
+    <meta property="og:type" content="article" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:title" content="" />
+    <meta property="og:description" content="" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1136851555905555"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div class="page content-page">
+      <header class="hero hero--article">
+        <div class="hero__text">
+          <p class="eyebrow" id="hero-eyebrow"></p>
+          <h1 id="hero-title"></h1>
+          <p class="mini-lede" id="hero-lede"></p>
+        </div>
+        <div class="hero__cta">
+          <a href="index.html" class="btn ghost article-back" id="nav-back"></a>
+        </div>
+      </header>
+
+      <section class="ad-banner ad-banner--article" aria-label="Publicidad">
+        <div class="ad-banner__content">
+          <p class="mini-label" id="ad-label"></p>
+          <ins
+            class="adsbygoogle"
+            style="display: block"
+            data-ad-client="ca-pub-1136851555905555"
+            data-ad-slot="0000000000"
+            data-ad-format="auto"
+            data-full-width-responsive="true"
+          ></ins>
+          <script>
+            (function () {
+              const adSlot = document.querySelector('.adsbygoogle');
+              let attempts = 0;
+              const maxAttempts = 20;
+              const initAd = () => {
+                if (!adSlot || attempts >= maxAttempts) return;
+                attempts += 1;
+                if (adSlot.offsetWidth === 0) {
+                  requestAnimationFrame(initAd);
+                  return;
+                }
+                try {
+                  (window.adsbygoogle = window.adsbygoogle || []).push({});
+                } catch (err) {
+                  console.warn('Ads not loaded', err);
+                }
+              };
+              requestAnimationFrame(initAd);
+            })();
+          </script>
+        </div>
+      </section>
+
+      <main class="policy-page article-main" data-article-id="compoundInterest">
+        <div id="article-content" class="article-content"></div>
+
+        <div class="policy-block article-cta-block">
+          <p class="lede" id="cta-text"></p>
+          <a href="index.html" class="btn primary" id="cta-btn"></a>
+        </div>
+      </main>
+
+      <footer class="footer">
+        <div>
+          <p class="mini-label" id="footer-legal-label"></p>
+          <p class="mini-lede" id="footer-legal-text"></p>
+        </div>
+        <div class="footer__meta">
+          <nav class="footer__links footer__links--articles">
+            <a href="privacidad.html" id="nav-privacy"></a>
+            <a href="cookies.html" id="nav-cookies"></a>
+            <a href="aviso-legal.html" id="nav-legal"></a>
+          </nav>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      (async () => {
+        const get = (obj, path) =>
+          path.split('.').reduce((acc, part) => (acc && acc[part] !== undefined ? acc[part] : null), obj);
+
+        const setMeta = (attr, key, value) => {
+          if (!value) return;
+          let meta = document.querySelector(`meta[${attr}="${key}"]`);
+          if (!meta) {
+            meta = document.createElement('meta');
+            meta.setAttribute(attr, key);
+            document.head.appendChild(meta);
+          }
+          meta.setAttribute('content', value);
+        };
+
+        try {
+          const res = await fetch('locales/es-ES.json');
+          const t = await res.json();
+
+          const main = document.querySelector('[data-article-id]');
+          const articleId = main?.getAttribute('data-article-id');
+          const articleData = get(t, `articles.${articleId}`) || {};
+          const common = get(t, 'articles.common') || {};
+
+          if (!articleId || !articleData.meta) return;
+
+          const title = articleData.meta.title || 'Artículo';
+          const description = articleData.meta.description || '';
+
+          document.title = title;
+          setMeta('name', 'description', description);
+          setMeta('property', 'og:title', title);
+          setMeta('property', 'og:description', description);
+
+          document.getElementById('hero-eyebrow').textContent = articleData.hero?.eyebrow || '';
+          document.getElementById('hero-title').textContent = articleData.hero?.title || '';
+          document.getElementById('hero-lede').textContent = articleData.hero?.lede || '';
+          document.getElementById('nav-back').textContent = common.backToCalc || 'Volver';
+          document.getElementById('ad-label').textContent = common.adLabel || 'Publicidad';
+
+          const contentContainer = document.getElementById('article-content');
+          const sections = Array.isArray(articleData.content) ? articleData.content : [];
+          sections.forEach((section) => {
+            const article = document.createElement('article');
+            article.className = 'policy-block article-block';
+
+            const h2 = document.createElement('h2');
+            h2.textContent = section.heading;
+
+            const body = document.createElement('div');
+            body.className = 'article-body';
+            body.innerHTML = section.body;
+
+            article.appendChild(h2);
+            article.appendChild(body);
+            contentContainer.appendChild(article);
+          });
+
+          document.getElementById('cta-text').textContent = articleData.cta?.text || '';
+          document.getElementById('cta-btn').textContent =
+            articleData.cta?.button || common.backToCalc || 'Volver';
+
+          document.getElementById('footer-legal-label').textContent = common.legalNote || '';
+          document.getElementById('footer-legal-text').textContent = common.legalDisclaimer || '';
+
+          document.getElementById('nav-privacy').textContent = get(t, 'footer.privacy') || 'Privacidad';
+          document.getElementById('nav-cookies').textContent = get(t, 'footer.cookies') || 'Cookies';
+          document.getElementById('nav-legal').textContent = get(t, 'footer.legal') || 'Aviso legal';
+        } catch (err) {
+          console.error('Unable to load translations', err);
+        }
+      })();
+    </script>
+  </body>
+</html>
